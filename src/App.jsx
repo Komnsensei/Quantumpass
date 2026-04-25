@@ -3,6 +3,7 @@ import { getStats } from './api';
 import CreatePassport from './components/CreatePassport';
 import PassportViewer from './components/PassportViewer';
 import Leaderboard from './components/Leaderboard';
+import KraftAgent from './components/KraftAgent';
 
 function App() {
   const [tab, setTab] = useState('home');
@@ -153,8 +154,10 @@ function App() {
           </div>
         )}
       </main>
+      <KraftAgent currentPage={tab} />
     </div>
   );
 }
 
 export default App;
+
