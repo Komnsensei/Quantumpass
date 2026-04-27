@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const { createPassport, validatePassport, getTier } = require('./pass-schema');
 const { checkVowCompliance, logToLedger, expandMeaning } = require('./governance');
+const { sessionEnter, sessionExit } = require('../src/api');
 
 const PASSES_DIR = path.join(__dirname, '../passes');
 const LEDGER_PATH = path.join(__dirname, '../ledger/sessions.jsonl');
@@ -106,7 +107,7 @@ VOW COMPLIANCE:
 `;
 }
 
-function processSessionEntry(pass, llmTarget) {
+async function processSessionEntry(pass, llmTarget) {
   const session = createSessionEntry(pass, llmTarget);
 
   // Log session entry to ledger
@@ -120,16 +121,25 @@ function processSessionEntry(pass, llmTarget) {
     vow_standing: session.vow_standing
   });
 
-  // Generate instruction block
-  const instructionBlock = generateInstructionBlock(pass, llmTarget);
-
-  return {
-    session,
-    instruction_block: instructionBlock
-  };
+  // Call HexAgent endpoint for instruction block
+  try {
+    const hexAgentResult = await sessionEnter(pass, llmTarget);
+    return {
+      session: hexAgentResult.session,
+      instruction_block: hexAgentResult.instruction_block
+    };
+  } catch (error) {
+    // Fallback to local generation if HexAgent unavailable
+    console.warn('HexAgent endpoint unavailable, using local instruction block');
+    const instructionBlock = generateInstructionBlock(pass, llmTarget);
+    return {
+      session,
+      instruction_block: instructionBlock
+    };
+  }
 }
 
-function processSessionExit(sessionId, sessionSummary, newBeads, scoreDeltas) {
+async function processSessionExit(sessionId, sessionSummary, newBeads, scoreDeltas) {
   const pass = loadPassport('cV-1J');
   if (!pass) {
     throw new Error('Passport not found for exit');
@@ -167,15 +177,23 @@ function processSessionExit(sessionId, sessionSummary, newBeads, scoreDeltas) {
     new_degrees: pass.degrees
   });
 
-  // Save updated pass
-  savePassport(pass);
-
-  return {
-    pass,
-    session_id: sessionId,
-    beads_minted: newBeads ? newBeads.length : 0,
-    score_deltas: scoreDeltas
-  };
+  // Call HexAgent endpoint for session exit
+  try {
+    const hexAgentResult = await sessionExit(sessionId, sessionSummary, newBeads, scoreDeltas);
+    // Save updated pass from HexAgent response
+    savePassport(hexAgentResult.pass);
+    return hexAgentResult;
+  } catch (error) {
+    // Fallback to local save if HexAgent unavailable
+    console.warn('HexAgent endpoint unavailable, using local pass update');
+    savePassport(pass);
+    return {
+      pass,
+      session_id: sessionId,
+      beads_minted: newBeads ? newBeads.length : 0,
+      score_deltas: scoreDeltas
+    };
+  }
 }
 
 module.exports = {
