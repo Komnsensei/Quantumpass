@@ -25,3 +25,9 @@ dist-ssr
 
 .vercel
 .env*.local
+
+# QuantumPass data
+passes/*
+ledger/*
+!passes/.gitkeep
+!ledger/.gitkeep
