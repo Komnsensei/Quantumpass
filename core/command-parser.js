@@ -25,30 +25,39 @@ const COMMANDS = {
     handler: (pass) => {
       if (!pass) return 'No passport loaded.';
       const tier = getTier(pass.degrees);
-      return `
-╔══════════════════════════════════════════════════════════════╗
-║                    QUANTUMPASS SNAPSHOT                      ║
-╠══════════════════════════════════════════════════════════════╣
-║ Holder: ${pass.holder.canonical_name.padEnd(48)}║
-║ Handle: ${pass.holder.handle.padEnd(48)}║
-║ Tier:   ${tier.name.padEnd(48)}║
-║ Degrees: ${pass.degrees.toString().padEnd(47)}║
-║ Vow:    ${pass.vow_standing.padEnd(47)}║
-╠══════════════════════════════════════════════════════════════╣
-║ Co-Signatories:                                             ║
-${pass.co_signatories.map(s => `║   - ${s.name} (${s.role}) — ${s.share}%`).join('\n')}
-╠══════════════════════════════════════════════════════════════╣
-║ Skills: ${pass.skills.length.toString().padEnd(50)}║
-${pass.skills.map(s => `║   - ${s}`).join('\n')}
-╠══════════════════════════════════════════════════════════════╣
-║ Personas: ${pass.personas.length.toString().padEnd(49)}║
-${pass.personas.map(p => `║   - ${p}`).join('\n')}
-╠══════════════════════════════════════════════════════════════╣
-║ Archive Anchor: ${pass.archive_anchor || 'None'.padEnd(42)}║
-║ Created: ${pass.created_at.padEnd(48)}║
-║ Updated: ${pass.updated_at.padEnd(48)}║
-╚══════════════════════════════════════════════════════════════╝
-`;
+      const anchor = pass.archive_anchor || 'None';
+      const lines = [
+        '',
+        '=================================================================',
+        '                    QUANTUMPASS SNAPSHOT                         ',
+        '=================================================================',
+        `  Holder:        ${pass.holder.canonical_name}`,
+        `  Handle:        ${pass.holder.handle}`,
+        '-----------------------------------------------------------------',
+        `  Tier:          ${tier.name}`,
+        `  Degrees:       ${pass.degrees}`,
+        `  Vow Standing:  ${pass.vow_standing}`,
+        '-----------------------------------------------------------------',
+        '  Co-Signatories:',
+        ...pass.co_signatories.map(s =>
+          `    - ${s.name} (${s.role}) -- ${s.share}%`
+        ),
+        '-----------------------------------------------------------------',
+        `  Skills (${pass.skills.length}):`,
+        ...(pass.skills.length === 0
+          ? ['    (none yet)']
+          : pass.skills.map(s => `    - ${s}`)),
+        '-----------------------------------------------------------------',
+        `  Personas (${pass.personas.length}):`,
+        ...pass.personas.map(p => `    - ${p}`),
+        '-----------------------------------------------------------------',
+        `  Archive Anchor: ${anchor}`,
+        `  Created:        ${pass.created_at || '-'}`,
+        `  Updated:        ${pass.updated_at || '-'}`,
+        '=================================================================',
+        ''
+      ];
+      return lines.join('\n');
     }
   },
   recent: {
