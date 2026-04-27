@@ -3,8 +3,14 @@
  * Canonical law enforcement: "Never coerce. Expand meaning. Archive everything."
  */
 
-const fs = require('fs');
-const path = require('path');
+export { CANONICAL_LAW, checkVowCompliance, expandMeaning, logToLedger, createRefusalBlock, getGovernanceState };
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const CANONICAL_LAW = {
   version: '1.0',
@@ -146,11 +152,3 @@ function getGovernanceState() {
   };
 }
 
-module.exports = {
-  CANONICAL_LAW,
-  checkVowCompliance,
-  expandMeaning,
-  logToLedger,
-  createRefusalBlock,
-  getGovernanceState
-};

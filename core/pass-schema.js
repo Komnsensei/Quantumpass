@@ -3,6 +3,8 @@
  * Canonical JSON structure for user+LLM identity and scoring protocol
  */
 
+export { TIER_LEVELS, VOW_STATUS, BEAD_TYPES, getTier, createPassport, validatePassport, createBead };
+
 const TIER_LEVELS = {
   SEED: { min: 0, max: 39, name: 'SEED', color: '#64748b', bg: 'rgba(100,116,139,0.15)' },
   APPRENTICE: { min: 40, max: 59, name: 'APPRENTICE', color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
@@ -107,12 +109,3 @@ function createBead(type, content, metadata = {}) {
   };
 }
 
-module.exports = {
-  TIER_LEVELS,
-  VOW_STATUS,
-  BEAD_TYPES,
-  getTier,
-  createPassport,
-  validatePassport,
-  createBead
-};

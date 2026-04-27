@@ -3,8 +3,8 @@
  * Session entry endpoint - accepts pass snapshot, returns instruction block
  */
 
-const { loadPassport, processSessionEntry } = require('../../core/session-loop');
-const { checkVowCompliance, logToLedger, createRefusalBlock } = require('../../core/governance');
+import { loadPassport, processSessionEntry } from '../../core/session-loop.js';
+import { checkVowCompliance, logToLedger, createRefusalBlock } from '../../core/governance.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

@@ -3,11 +3,18 @@
  * Manages POST/GET cycle for HexAgent governance
  */
 
-const fs = require('fs');
-const path = require('path');
-const { createPassport, validatePassport, getTier } = require('./pass-schema');
-const { checkVowCompliance, logToLedger, expandMeaning } = require('./governance');
-const { sessionEnter, sessionExit } = require('../src/api');
+export { loadPassport, savePassport, processSessionEntry, processSessionExit, generateInstructionBlock };
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import { createPassport, validatePassport, getTier } from './pass-schema.js';
+import { checkVowCompliance, logToLedger, expandMeaning } from './governance.js';
+import { sessionEnter, sessionExit } from '../src/api.js';
 
 const PASSES_DIR = path.join(__dirname, '../passes');
 const LEDGER_PATH = path.join(__dirname, '../ledger/sessions.jsonl');
@@ -196,10 +203,3 @@ async function processSessionExit(sessionId, sessionSummary, newBeads, scoreDelt
   }
 }
 
-module.exports = {
-  loadPassport,
-  savePassport,
-  processSessionEntry,
-  processSessionExit,
-  generateInstructionBlock
-};

@@ -3,8 +3,8 @@
  * Returns canonical pass state from offshore record
  */
 
-const { loadPassport } = require('../../core/pass-schema');
-const { checkVowCompliance, logToLedger } = require('../../core/governance');
+import { loadPassport } from '../../core/pass-schema.js';
+import { checkVowCompliance, logToLedger } from '../../core/governance.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {

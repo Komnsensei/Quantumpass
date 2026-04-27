@@ -3,9 +3,9 @@
  * Verifies all 10 steps of the v1.0 beta-live demo
  */
 
-const { loadPassport, savePassport } = require('../core/pass-schema');
-const { sessionEnter, sessionExit, mintBead, getPass } = require('../src/api');
-const { parseCommand, executeCommand } = require('../core/command-parser');
+import { loadPassport, savePassport, processSessionEntry, processSessionExit } from '../core/session-loop.js';
+import { sessionEnter, sessionExit, mintBead, getPass } from '../src/api.js';
+import { parseCommand, executeCommand } from '../core/command-parser.js';
 
 const HOLDER_ID = 'cV-1J';
 const LLM_TARGET = 'claude';
@@ -217,7 +217,7 @@ async function runDemoWalkthrough() {
 }
 
 // Run if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   runDemoWalkthrough()
     .then(results => {
       process.exit(results.filter(r => r.status === 'FAIL').length > 0 ? 1 : 0);
@@ -228,4 +228,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { runDemoWalkthrough };
+export { runDemoWalkthrough };

@@ -3,10 +3,14 @@
  * Accepts bead payload, returns Zenodo deposition status
  */
 
-const { loadPassport, savePassport, createBead } = require('../../core/pass-schema');
-const { checkVowCompliance, logToLedger, createRefusalBlock } = require('../../core/governance');
-const fs = require('fs');
-const path = require('path');
+import { loadPassport, savePassport, createBead } from '../../core/pass-schema.js';
+import { checkVowCompliance, logToLedger, createRefusalBlock } from '../../core/governance.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const MINT_LEDGER_PATH = path.join(__dirname, '../../ledger/mints.jsonl');
 

@@ -3,8 +3,14 @@
  * Handles Zenodo deposit + DOI retrieval for bead minting
  */
 
-const fs = require('fs');
-const path = require('path');
+export { createZenodoDeposition, getZenodoDOI, shouldAutoMint, logToMintLedger };
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const MINT_LEDGER_PATH = path.join(__dirname, '../ledger/mints.jsonl');
 
@@ -146,9 +152,3 @@ function shouldAutoMint(beadType) {
   return ['prestige', 'ethical', 'co_craft'].includes(beadType);
 }
 
-module.exports = {
-  createZenodoDeposition,
-  getZenodoDOI,
-  shouldAutoMint,
-  logToMintLedger
-};

@@ -3,9 +3,9 @@
  * QuantumPass session loop with /help command set
  */
 
-const { loadPassport, savePassport, processSessionEntry, processSessionExit } = require('./session-loop');
-const { parseCommand, executeCommand } = require('./command-parser');
-const { sessionEnter, sessionExit, mintBead } = require('../src/api');
+import { loadPassport, savePassport, processSessionEntry, processSessionExit } from './session-loop.js';
+import { parseCommand, executeCommand } from './command-parser.js';
+import { sessionEnter, sessionExit, mintBead } from '../src/api.js';
 
 const HOLDER_ID = 'cV-1J';
 const LLM_TARGET = 'claude';
@@ -132,8 +132,8 @@ async function main() {
 }
 
 // Run if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(console.error);
 }
 
-module.exports = { startSession, handleCommand, endSession };
+export { startSession, handleCommand, endSession };

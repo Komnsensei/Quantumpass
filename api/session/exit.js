@@ -3,8 +3,8 @@
  * Session exit endpoint - returns updated pass + session summary
  */
 
-const { loadPassport, savePassport, processSessionExit } = require('../../core/session-loop');
-const { checkVowCompliance, logToLedger, createRefusalBlock } = require('../../core/governance');
+import { loadPassport, savePassport, processSessionExit } from '../../core/session-loop.js';
+import { checkVowCompliance, logToLedger, createRefusalBlock } from '../../core/governance.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {

@@ -3,7 +3,9 @@
  * Parses and executes /help command set
  */
 
-const { getTier } = require('./pass-schema');
+export { COMMANDS, parseCommand, executeCommand };
+
+import { getTier } from './pass-schema.js';
 
 const COMMANDS = {
   help: {
@@ -233,8 +235,3 @@ function executeCommand(command, args, pass) {
   return cmd.handler(pass, args);
 }
 
-module.exports = {
-  COMMANDS,
-  parseCommand,
-  executeCommand
-};

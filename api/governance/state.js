@@ -3,8 +3,8 @@
  * Returns canonical law, disposition, current vow standings
  */
 
-const { getGovernanceState } = require('../../core/governance');
-const { logToLedger } = require('../../core/governance');
+import { getGovernanceState } from '../../core/governance.js';
+import { logToLedger } from '../../core/governance.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
