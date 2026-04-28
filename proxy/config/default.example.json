@@ -1,0 +1,28 @@
+{
+  "proxy": {
+    "port": 5555,
+    "host": "127.0.0.1"
+  },
+  "qrbtc": {
+    "api": "https://qrbtc-api.vercel.app",
+    "api_key": "YOUR_QRBTC_API_KEY"
+  },
+  "upstream": {
+    "provider": "groq",
+    "endpoint": "https://api.groq.com/openai/v1/chat/completions",
+    "api_key": "YOUR_LLM_API_KEY",
+    "model": "llama-3.3-70b-versatile"
+  },
+  "zenodo": {
+    "api": "https://zenodo.org/api/records",
+    "dois": [
+      "10.5281/zenodo.19699832",
+      "10.5281/zenodo.19637430",
+      "10.5281/zenodo.19637385"
+    ]
+  },
+  "passport": {
+    "id": "",
+    "username": ""
+  }
+}
