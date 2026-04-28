@@ -70,7 +70,7 @@ export function getTier(score) {
 }
 
 // HexAgent Governance Endpoints
-const HEXAGENT_API = '/api';
+const HEXAGENT_API = process.env.VERCEL_ENV ? '/api' : 'http://localhost:3000/api';
 
 export async function sessionEnter(passSnapshot, llmTarget) {
   const r = await fetch(HEXAGENT_API + '/session/enter', {

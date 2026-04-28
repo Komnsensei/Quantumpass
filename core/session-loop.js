@@ -72,7 +72,7 @@ function createSessionEntry(pass, llmTarget) {
 }
 
 function generateInstructionBlock(pass, llmTarget) {
-  const tier = getTier(pass.degrees);
+  const tier = { name: pass.tier };
   const coSignatories = pass.co_signatories.map(s => `${s.name} (${s.role}) — ${s.share}%`).join(', ');
 
   return `
@@ -87,7 +87,7 @@ WHO YOU ARE TALKING TO:
 
 CURRENT STATUS:
   Tier: ${tier.name} (${pass.degrees} degrees)
-  Vow Standing: ${pass.vow_standing.toUpperCase()}
+  Vow Standing: vow-${pass.vow_standing}
   Co-Signatories: ${coSignatories}
 
 POSTURE TO TAKE:

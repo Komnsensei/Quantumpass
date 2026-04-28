@@ -31,3 +31,4 @@ passes/*
 ledger/*
 !passes/.gitkeep
 !ledger/.gitkeep
+.env

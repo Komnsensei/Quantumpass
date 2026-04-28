@@ -1,11 +1,13 @@
-/**
+﻿/**
  * PowerShell-based CLI Entry Point
  * QuantumPass session loop with /help command set
  */
 
+import readline from 'readline';
 import { loadPassport, savePassport, processSessionEntry, processSessionExit } from './session-loop.js';
 import { parseCommand, executeCommand } from './command-parser.js';
 import { sessionEnter, sessionExit, mintBead } from '../src/api.js';
+import { runIntro } from './intro-animation.js';
 
 const HOLDER_ID = 'cV-1J';
 const LLM_TARGET = 'claude';
@@ -14,10 +16,6 @@ let currentSession = null;
 let currentPass = null;
 
 async function startSession() {
-  console.log('\n═══════════════════════════════════════════════════════════════');
-  console.log('           QUANTUMPASS v1.0 — SESSION START');
-  console.log('═══════════════════════════════════════════════════════════════\n');
-
   // Load passport
   currentPass = loadPassport(HOLDER_ID);
   if (!currentPass) {
@@ -25,22 +23,21 @@ async function startSession() {
     process.exit(1);
   }
 
-  console.log(`Holder: ${currentPass.holder.canonical_name}`);
-  console.log(`Tier: ${currentPass.tier} (${currentPass.degrees} degrees)`);
-  console.log(`Vow Standing: ${currentPass.vow_standing.toUpperCase()}\n`);
+  // Cinematic intro animation (skip with QUANTUMPASS_NO_INTRO=1)
+  await runIntro(currentPass);
 
   // Enter session via HexAgent
   try {
     const entryResult = await sessionEnter(currentPass, LLM_TARGET);
     currentSession = entryResult.session;
 
-    console.log('═══════════════════════════════════════════════════════════════');
-    console.log('              HEXAGENT INSTRUCTION BLOCK');
-    console.log('═══════════════════════════════════════════════════════════════');
+    console.log('\x1b[36m─────────────────────────────────────────────────────────────────\x1b[0m');
+    console.log('\x1b[2m  HEXAGENT — INSTRUCTION BLOCK\x1b[0m');
+    console.log('\x1b[36m─────────────────────────────────────────────────────────────────\x1b[0m');
     console.log(entryResult.instruction_block);
-    console.log('═══════════════════════════════════════════════════════════════\n');
+    console.log('\x1b[36m─────────────────────────────────────────────────────────────────\x1b[0m\n');
 
-    console.log('Session active. Type /help for commands.\n');
+    console.log('\x1b[2mSession active. Type /help for commands.\x1b[0m\n');
 
   } catch (error) {
     console.error('Failed to enter session:', error.message);
@@ -52,7 +49,6 @@ async function handleCommand(input) {
   const parsed = parseCommand(input);
 
   if (!parsed) {
-    // Not a command, treat as LLM input
     console.log('[LLM input received - would be sent to LLM backend]');
     return;
   }
@@ -61,12 +57,10 @@ async function handleCommand(input) {
 
   console.log(result);
 
-  // Save pass if it was modified
   if (parsed.command === 'skill_add' || parsed.command === 'mint') {
     savePassport(currentPass);
   }
 
-  // Handle /seal command
   if (parsed.command === 'seal') {
     await endSession();
   }
@@ -83,12 +77,11 @@ async function endSession() {
   }
 
   try {
-    // Exit session via HexAgent
     const exitResult = await sessionExit(
       currentSession.session_id,
       currentPass.last_session_summary,
       currentPass.recent_beads,
-      { degrees: 0 } // No score delta for now
+      { degrees: 0 }
     );
 
     console.log('Session sealed.');
@@ -96,7 +89,6 @@ async function endSession() {
     console.log(`Beads minted: ${exitResult.beads_minted}`);
     console.log(`Pass updated: ${exitResult.pass.tier} (${exitResult.pass.degrees} degrees)\n`);
 
-    // Save updated pass
     savePassport(exitResult.pass);
 
     console.log('═══════════════════════════════════════════════════════════════');
@@ -111,12 +103,9 @@ async function endSession() {
   }
 }
 
-// Main CLI loop
 async function main() {
   await startSession();
 
-  // Simple readline interface
-  const readline = require('readline');
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -131,9 +120,6 @@ async function main() {
   });
 }
 
-// Run if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch(console.error);
-}
+main().catch(console.error);
 
 export { startSession, handleCommand, endSession };

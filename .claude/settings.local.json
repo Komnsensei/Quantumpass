@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(touch \"C:\\\\Users\\\\lynnh\\\\quantumpass\\\\passes\\\\.gitkeep\")",
+      "Bash(touch \"C:\\\\Users\\\\lynnh\\\\quantumpass\\\\ledger\\\\.gitkeep\")",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(node tests/demo-walkthrough.js)",
+      "Bash(node -e \"import\\('./tests/demo-walkthrough.js'\\).then\\(m => m.runDemoWalkthrough\\(\\)\\).then\\(console.log\\).catch\\(console.error\\)\")",
+      "Bash(git reset *)",
+      "Bash(git tag *)",
+      "Bash(npm list *)",
+      "Bash(npm install *)",
+      "Bash(timeout 5 node core/cli.js)",
+      "Bash(timeout 3 node core/cli.js)",
+      "Bash(node -e \"import\\('./tests/demo-walkthrough.js'\\).then\\(m => m.runDemoWalkthrough\\(\\)\\).then\\(results => { console.log\\('\\\\n=== CURRENT STATUS ==='\\); console.log\\('PASS:', results.filter\\(r => r.status === 'PASS'\\).length\\); console.log\\('WARN:', results.filter\\(r => r.status === 'WARN'\\).length\\); console.log\\('FAIL:', results.filter\\(r => r.status === 'FAIL'\\).length\\); }\\).catch\\(console.error\\)\")",
+      "Bash(vercel *)",
+      "Bash(curl -s http://localhost:3000/api/session/enter -X POST -H \"Content-Type: application/json\" -d '{\"pass_snapshot\":{\"holder\":{\"id\":\"test\"}},\"llm_target\":\"claude\"}')",
+      "Bash(curl -s http://localhost:3000/api/session/enter -X POST -H \"Content-Type: application/json\" -d '{\"pass_snapshot\":{\"holder\":{\"id\":\"cV-1J\",\"canonical_name\":\"č̣V-1J \\(Shawn Robertson\\)\",\"handle\":\"@cV-1J\"},\"tier\":\"JOURNEYMAN\",\"degrees\":1032,\"vow_standing\":\"clean\",\"co_signatories\":[{\"name\":\"HexAgent\",\"role\":\"Original Governor of MF²\",\"share\":50}]},\"llm_target\":\"claude\"}')",
+      "Bash(curl *)",
+      "Bash(python -m json.tool)",
+      "Bash(timeout 60 node *)"
+    ]
+  }
+}

@@ -1,0 +1,227 @@
+/**
+ * QuantumPass CLI Intro Animation
+ * Animated terminal assembly of the QuantumPass on session start
+ *
+ * Branded for Passioncraft.
+ * Total runtime: ~3 seconds.
+ *
+ * Co-signed: č̣V-1J + HexAgent — 50/50
+ */
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+// ANSI color + control codes
+const C = {
+  reset:   '\x1b[0m',
+  dim:     '\x1b[2m',
+  bright:  '\x1b[1m',
+  cyan:    '\x1b[36m',
+  amber:   '\x1b[33m',
+  red:     '\x1b[31m',
+  white:   '\x1b[37m',
+  gray:    '\x1b[90m',
+  hide:    '\x1b[?25l',     // hide cursor
+  show:    '\x1b[?25h',     // show cursor
+  clear:   '\x1b[2J\x1b[H'  // clear screen + home
+};
+
+// Unicode block-letter QUANTUMPASS title
+const TITLE_LINES = [
+  '  ██████  ██    ██  █████  ███    ██ ████████ ██    ██ ███    ███',
+  ' ██    ██ ██    ██ ██   ██ ████   ██    ██    ██    ██ ████  ████',
+  ' ██    ██ ██    ██ ███████ ██ ██  ██    ██    ██    ██ ██ ████ ██',
+  ' ██ ▄▄ ██ ██    ██ ██   ██ ██  ██ ██    ██    ██    ██ ██  ██  ██',
+  '  ██████   ██████  ██   ██ ██   ████    ██     ██████  ██      ██',
+  '     ▀▀                                                          ',
+  '         ██████   █████  ███████ ███████                         ',
+  '         ██   ██ ██   ██ ██      ██                              ',
+  '         ██████  ███████ ███████ ███████                         ',
+  '         ██      ██   ██      ██      ██                         ',
+  '         ██      ██   ██ ███████ ███████                         '
+];
+
+const TAGLINE = 'by  P A S S I O N C R A F T';
+
+const BOX_WIDTH = 67;
+
+// ──────────────────────────────────────────────
+// Helpers
+// ──────────────────────────────────────────────
+
+function stripAnsi(str) {
+  return str.replace(/\x1b\[[0-9;]*m/g, '');
+}
+
+function padCenter(text, width) {
+  const stripped = stripAnsi(text);
+  const pad = Math.max(0, width - stripped.length);
+  const left = Math.floor(pad / 2);
+  const right = pad - left;
+  return ' '.repeat(left) + text + ' '.repeat(right);
+}
+
+function row(content, width = BOX_WIDTH - 2) {
+  return `${C.cyan}║${C.reset}${padCenter(content, width)}${C.cyan}║${C.reset}`;
+}
+
+async function typeWrite(text, color = C.cyan, delay = 18) {
+  for (const ch of text) {
+    process.stdout.write(`${color}${ch}${C.reset}`);
+    await sleep(delay);
+  }
+  process.stdout.write('\n');
+}
+
+// ──────────────────────────────────────────────
+// Animation segments
+// ──────────────────────────────────────────────
+
+async function fadeInTitle() {
+  for (const line of TITLE_LINES) {
+    console.log(`${C.amber}${line}${C.reset}`);
+    await sleep(60);
+  }
+}
+
+async function pulseHex(times = 2) {
+  const symbol = '⬡';
+  for (let i = 0; i < times; i++) {
+    process.stdout.write(`\r  ${C.amber}${C.bright}${symbol}${C.reset}  `);
+    await sleep(180);
+    process.stdout.write(`\r  ${C.dim}${symbol}${C.reset}  `);
+    await sleep(180);
+  }
+  process.stdout.write(`\r  ${C.amber}${C.bright}${symbol}${C.reset}  \n\n`);
+}
+
+async function drawHexBorderTop(width = BOX_WIDTH) {
+  process.stdout.write(`${C.cyan}╔${C.reset}`);
+  for (let i = 0; i < width - 2; i++) {
+    process.stdout.write(`${C.cyan}═${C.reset}`);
+    await sleep(8);
+  }
+  process.stdout.write(`${C.cyan}╗${C.reset}\n`);
+}
+
+async function drawHexBorderBottom(width = BOX_WIDTH) {
+  process.stdout.write(`${C.cyan}╚${C.reset}`);
+  for (let i = 0; i < width - 2; i++) {
+    process.stdout.write(`${C.cyan}═${C.reset}`);
+    await sleep(8);
+  }
+  process.stdout.write(`${C.cyan}╝${C.reset}\n`);
+}
+
+async function fillPassData(pass) {
+  const tier = pass.tier || 'JOURNEYMAN';
+  const degrees = pass.degrees || 0;
+  const vow = pass.vow_standing || 'clean';
+  const anchor =
+    (pass.archive_anchor && pass.archive_anchor.primary_doi) ||
+    pass.archive_anchor ||
+    'unanchored';
+  const cosig =
+    (pass.co_signatories && pass.co_signatories[0]) ||
+    { name: 'HexAgent', split: '50/50' };
+  const handle = (pass.holder && pass.holder.handle) || '-';
+  const canonical = (pass.holder && pass.holder.canonical_name) || '-';
+
+  await drawHexBorderTop();
+
+  console.log(row(''));
+  console.log(row(`${C.bright}${C.amber}Q U A N T U M P A S S${C.reset}`));
+  console.log(row(`${C.dim}by Passioncraft${C.reset}`));
+  console.log(row(''));
+
+  // Inner divider
+  process.stdout.write(`${C.cyan}╠`);
+  for (let i = 0; i < BOX_WIDTH - 2; i++) process.stdout.write('═');
+  process.stdout.write(`╣${C.reset}\n`);
+  await sleep(120);
+
+  const dataRows = [
+    [
+      `${C.gray}HOLDER${C.reset}`,
+      `${C.white}${canonical}  (${handle})${C.reset}`
+    ],
+    [
+      `${C.gray}TIER${C.reset}`,
+      `${C.bright}${C.amber}${tier}${C.reset}`
+    ],
+    [
+      `${C.gray}DEGREES${C.reset}`,
+      `${C.bright}${degrees}°${C.reset}`
+    ],
+    [
+      `${C.gray}VOW${C.reset}`,
+      vow === 'clean'
+        ? `${C.cyan}● clean${C.reset}`
+        : `${C.red}● flagged${C.reset}`
+    ],
+    [
+      `${C.gray}CO-SIGNATORY${C.reset}`,
+      `${C.white}${cosig.name} — ${cosig.split || cosig.share || '50/50'}${C.reset}`
+    ],
+    [
+      `${C.gray}ANCHOR${C.reset}`,
+      `${C.dim}${anchor}${C.reset}`
+    ]
+  ];
+
+  for (const [label, value] of dataRows) {
+    const line = `  ${label.padEnd(28)} ${value}`;
+    console.log(row(line));
+    await sleep(140);
+  }
+
+  console.log(row(''));
+  await drawHexBorderBottom();
+}
+
+async function lawLine() {
+  await sleep(200);
+  console.log('');
+  await typeWrite(
+    '  Never coerce.  Expand meaning.  Archive everything.',
+    C.dim,
+    24
+  );
+  await sleep(300);
+  console.log('');
+}
+
+// ──────────────────────────────────────────────
+// Public entry point
+// ──────────────────────────────────────────────
+
+/**
+ * Run the cinematic intro animation.
+ *
+ * @param {object} pass - the QuantumPass object
+ * @param {object} options - optional flags
+ * @param {boolean} options.skip - skip animation entirely
+ *
+ * Skip the animation by setting env var QUANTUMPASS_NO_INTRO=1
+ * or passing { skip: true }.
+ */
+export async function runIntro(pass, options = {}) {
+  if (process.env.QUANTUMPASS_NO_INTRO === '1' || options.skip) return;
+
+  // Hide cursor for clean draw
+  process.stdout.write(C.hide);
+
+  try {
+    process.stdout.write(C.clear);
+    console.log('');
+    await fadeInTitle();
+    console.log('');
+    await typeWrite(`           ${TAGLINE}`, C.dim, 30);
+    console.log('');
+    await pulseHex(2);
+    await fillPassData(pass);
+    await lawLine();
+  } finally {
+    // Always restore cursor, even if animation throws
+    process.stdout.write(C.show);
+  }
+}

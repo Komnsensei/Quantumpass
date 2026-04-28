@@ -48,7 +48,7 @@ export default async function handler(req, res) {
     }
 
     // Process session entry
-    const result = processSessionEntry(pass, llm_target);
+    const result = await processSessionEntry(pass, llm_target);
 
     // Log successful entry to ledger
     logToLedger({

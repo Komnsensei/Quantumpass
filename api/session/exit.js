@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     const score_deltas = req.query.score ? JSON.parse(req.query.score) : null;
 
     // Process session exit
-    const result = processSessionExit(session_id, session_summary, beads_minted, score_deltas);
+    const result = await processSessionExit(session_id, session_summary, beads_minted, score_deltas);
 
     // Log successful exit to ledger
     logToLedger({
