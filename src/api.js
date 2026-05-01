@@ -1,4 +1,6 @@
-﻿const API = 'https://qrbtc-api.vercel.app/api';
+const env = typeof process !== 'undefined' && process?.env ? process.env : (typeof import.meta !== 'undefined' ? import.meta.env : {});
+const API = env.VITE_QRBTC_API_URL || env.QRBTC_API_URL || 'https://qrbtc-api.vercel.app/api';
+const HEXAGENT_API = env.VITE_HEXAGENT_API_URL || env.HEXAGENT_API_URL || (typeof window !== 'undefined' ? '/api' : 'http://localhost:3000/api');
 
 export async function getStats() {
   const r = await fetch(API + '/analytics?action=stats');
@@ -70,25 +72,40 @@ export function getTier(score) {
 }
 
 // HexAgent Governance Endpoints
-const HEXAGENT_API = process.env.VERCEL_ENV ? '/api' : 'http://localhost:3000/api';
 
-export async function sessionEnter(passSnapshot, llmTarget) {
+export async function sessionEnter(passSnapshot, llmTarget, apiKey) {
   const r = await fetch(HEXAGENT_API + '/session/enter', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ pass_snapshot: passSnapshot, llm_target: llmTarget })
+    body: JSON.stringify({ pass_snapshot: passSnapshot, llm_target: llmTarget, api_key: apiKey })
   });
   return r.json();
 }
 
-export async function sessionExit(sessionId, summary, beads, scoreDeltas) {
+export async function sessionExit(sessionId, summary, beads, scoreDeltas, holderId, apiKey) {
   const params = new URLSearchParams();
   if (summary) params.append('summary', summary);
   if (beads) params.append('beads', JSON.stringify(beads));
   if (scoreDeltas) params.append('score', JSON.stringify(scoreDeltas));
+  if (holderId) params.append('holder_id', holderId);
+  if (apiKey) params.append('api_key', apiKey);
 
   const r = await fetch(`${HEXAGENT_API}/session/exit?${params.toString()}`, {
     method: 'GET'
+  });
+  return r.json();
+}
+
+export async function submitScoreHexAgent(holderId, scores, apiKey, sessionId) {
+  const r = await fetch(HEXAGENT_API + '/score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+    body: JSON.stringify({
+      holder_id: holderId,
+      session_id: sessionId || null,
+      api_key: apiKey,
+      ...scores
+    })
   });
   return r.json();
 }
@@ -103,7 +120,7 @@ export async function getPass(holderId) {
 export async function mintBead(holderId, beadType, beadContent, metadata) {
   const r = await fetch(HEXAGENT_API + '/bead/mint', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
     body: JSON.stringify({
       holder_id: holderId,
       bead_type: beadType,

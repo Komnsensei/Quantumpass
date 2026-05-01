@@ -1,0 +1,25 @@
+# Local secrets / env backups
+.env
+.env*
+*.env
+*.local
+.env.local.bak*
+.env*.bak*
+*.bak
+*.bak.*
+
+# Backup files
+**/*.bak
+**/*.bak.*
+
+# Local build/dev
+node_modules
+dist
+dist-ssr
+logs
+*.log
+.vercel
+
+# Dirty protocol workspace/submodule not part of QuantumPass deploy
+qbtc-protocol
+qbtc-protocol/**
