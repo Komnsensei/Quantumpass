@@ -42,19 +42,31 @@ const CANONICAL_LAW = {
 const LEDGER_PATH = path.join(__dirname, '../ledger/sessions.jsonl');
 
 function logToLedger(entry) {
-  const ledgerDir = path.dirname(LEDGER_PATH);
-  if (!fs.existsSync(ledgerDir)) {
-    fs.mkdirSync(ledgerDir, { recursive: true });
+  try {
+    // Vercel serverless filesystem is not durable/writable except /tmp.
+    // Never allow archive logging to crash production routes.
+    if (process.env.VERCEL) {
+      console.warn('[ledger skipped in Vercel]', entry?.event || 'unknown');
+      return false;
+    }
+
+    const ledgerDir = path.dirname(LEDGER_PATH);
+    if (!fs.existsSync(ledgerDir)) {
+      fs.mkdirSync(ledgerDir, { recursive: true });
+    }
+
+    const logLine = JSON.stringify({
+      timestamp: new Date().toISOString(),
+      ...entry
+    }) + '\n';
+
+    fs.appendFileSync(LEDGER_PATH, logLine, 'utf8');
+    return true;
+  } catch (error) {
+    console.warn('[ledger write failed]', error.message);
+    return false;
   }
-
-  const logLine = JSON.stringify({
-    timestamp: new Date().toISOString(),
-    ...entry
-  }) + '\n';
-
-  fs.appendFileSync(LEDGER_PATH, logLine, 'utf8');
 }
-
 function checkVowCompliance(action, context = {}) {
   const violations = [];
 

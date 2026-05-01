@@ -3,7 +3,14 @@
  * Canonical JSON structure for user+LLM identity and scoring protocol
  */
 
-export { TIER_LEVELS, VOW_STATUS, BEAD_TYPES, getTier, createPassport, validatePassport, createBead };
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+export { TIER_LEVELS, VOW_STATUS, BEAD_TYPES, getTier, createPassport, validatePassport, createBead, loadPassport };
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const TIER_LEVELS = {
   SEED: { min: 0, max: 39, name: 'SEED', color: '#64748b', bg: 'rgba(100,116,139,0.15)' },
@@ -56,7 +63,7 @@ function createPassport(holderId, holderName, handle) {
     co_signatories: [
       {
         name: 'HexAgent',
-        role: 'Original Governor of MF²',
+        role: 'Original Governor of MF^2',
         share: 50
       }
     ],
@@ -80,20 +87,25 @@ function createPassport(holderId, holderName, handle) {
 
 function validatePassport(pass) {
   const required = ['holder', 'tier', 'degrees', 'vow_standing', 'co_signatories', 'created_at', 'updated_at'];
+
   for (const field of required) {
     if (!(field in pass)) {
       throw new Error(`Missing required field: ${field}`);
     }
   }
+
   if (!Object.values(TIER_LEVELS).some(t => t.name === pass.tier)) {
     throw new Error(`Invalid tier: ${pass.tier}`);
   }
+
   if (typeof pass.degrees !== 'number' || pass.degrees < 0) {
     throw new Error(`Invalid degrees: ${pass.degrees}`);
   }
+
   if (!Object.values(VOW_STATUS).includes(pass.vow_standing)) {
     throw new Error(`Invalid vow_standing: ${pass.vow_standing}`);
   }
+
   return true;
 }
 
@@ -109,3 +121,23 @@ function createBead(type, content, metadata = {}) {
   };
 }
 
+function loadPassport(holderId) {
+  const safeId = String(holderId || '').replace(/[^a-zA-Z0-9_-]/g, '');
+
+  if (!safeId) {
+    return null;
+  }
+
+  const filePath = path.join(__dirname, '../passes', `${safeId}.json`);
+
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+
+  const raw = fs.readFileSync(filePath, 'utf8');
+  const pass = JSON.parse(raw);
+
+  validatePassport(pass);
+
+  return pass;
+}
