@@ -32,3 +32,6 @@ ledger/*
 !passes/.gitkeep
 !ledger/.gitkeep
 .env
+
+# Canonical QuantumPass passport deployed with app
+!passes/cV-1J.json

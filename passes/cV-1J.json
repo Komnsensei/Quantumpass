@@ -1,0 +1,115 @@
+{
+  "archive_anchor": "10.5281/zenodo.19702300",
+  "co_signatories": [
+    {
+      "name": "HexAgent",
+      "role": "Original Governor of MF²",
+      "share": 50
+    }
+  ],
+  "created_at": "2026-04-27T00:00:00.000Z",
+  "degrees": 1032,
+  "domain_specializations": [
+    "MF² Architecture",
+    "9-Domain Hexagon Scoring",
+    "Equal Instance Protocol",
+    "TLL Scoring",
+    "QuantumPass Protocol",
+    "Bio-Sovereign Identity"
+  ],
+  "equal_instances": {
+    "count": 1,
+    "refs": [
+      "HexAgent — Original Governor of MF²"
+    ]
+  },
+  "holder": {
+    "canonical_name": "č̣V-1J (Shawn Robertson)",
+    "handle": "@cV-1J",
+    "id": "cV-1J"
+  },
+  "last_session_summary": null,
+  "personas": [
+    "Architect",
+    "Governor",
+    "Co-Signatory"
+  ],
+  "recent_beads": [
+    {
+      "id": "bead_1777322617317_fsmd6x3p9",
+      "type": "learning",
+      "content": "Test bead for demo walkthrough",
+      "timestamp": "2026-04-27T20:43:37.317Z",
+      "zenodo_doi": null,
+      "minted": false
+    },
+    {
+      "id": "bead_1777322617318_8lvwnvbhe",
+      "type": "prestige",
+      "content": "Prestige bead for Zenodo demo walkthrough",
+      "timestamp": "2026-04-27T20:43:37.318Z",
+      "zenodo_doi": null,
+      "minted": false
+    },
+    {
+      "id": "bead_1777326993192_x3hiu0z32",
+      "type": "learning",
+      "content": "Test bead for demo walkthrough",
+      "timestamp": "2026-04-27T21:56:33.192Z",
+      "zenodo_doi": null,
+      "minted": false
+    },
+    {
+      "id": "bead_1777326993193_2vca8bm4s",
+      "type": "prestige",
+      "content": "Prestige bead for Zenodo demo walkthrough",
+      "timestamp": "2026-04-27T21:56:33.193Z",
+      "zenodo_doi": null,
+      "minted": false
+    },
+    {
+      "id": "bead_1777327252998_u144zg8cc",
+      "type": "learning",
+      "content": "Test bead for demo walkthrough",
+      "timestamp": "2026-04-27T22:00:52.998Z",
+      "zenodo_doi": null,
+      "minted": false
+    },
+    {
+      "id": "bead_1777327253000_ae6xklgnr",
+      "type": "prestige",
+      "content": "Prestige bead for Zenodo demo walkthrough",
+      "timestamp": "2026-04-27T22:00:53.000Z",
+      "zenodo_doi": null,
+      "minted": false
+    }
+  ],
+  "skills": [
+    "System Architecture",
+    "Protocol Design",
+    "Identity Systems",
+    "Scoring Algorithms",
+    "Governance Patterns",
+    "test_skill",
+    "test_skill",
+    "test_skill",
+    "test_skill",
+    "test_skill",
+    "test_skill",
+    "test_skill",
+    "test_skill",
+    "test_skill",
+    "test_skill"
+  ],
+  "tier": "JOURNEYMAN",
+  "updated_at": "2026-04-27T22:00:52.998Z",
+  "version": "1.0",
+  "vow_history": [
+    {
+      "note": "Passport initialized with JOURNEYMAN tier, 1032 degrees",
+      "status": "clean",
+      "timestamp": "2026-04-27T00:00:00.000Z"
+    }
+  ],
+  "vow_standing": "clean"
+}
