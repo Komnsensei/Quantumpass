@@ -1,37 +1,52 @@
-# Logs
-logs
+# deps
+node_modules/
+.pnp
+.pnp.js
+
+# build
+dist/
+build/
+
+# env — NEVER commit
+.env
+.env.local
+.env.*.local
+*.env
+
+# vercel
+.vercel
+
+# secrets
+vs-api-key.txt
+proxy/config/default.json
+proxy/test-*.js
+qbtc-protocol/qrbtc-api/test-*.cjs
+qbtc-protocol/qrbtc-api/_*.cjs
+
+# ledger data (large + has chain hashes)
+ledger/supabase-sessions-backup.json
+ledger/sessions.jsonl
+
+# passes (private chain data)
+passes/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# local only
 *.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-.vercel
-.env*.local
-
-# QuantumPass data
-passes/*
-ledger/*
-!passes/.gitkeep
-!ledger/.gitkeep
-.env
-
-# Canonical QuantumPass passport deployed with app
-!passes/cV-1J.json
+# Noise — never commit
+erslynnhquantumpass
+*.bak.*
+.env.local.bak*
+qbtc-protocol/
+builderbro/
+passes/
+ledger/
+QUANTUMPASS-v1.0-beta-VERIFYD-AUDIT*

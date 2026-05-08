@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { getStats } from "./api";
 import CreatePassport from "./components/CreatePassport";
 import PassportViewer from "./components/PassportViewer";
@@ -8,14 +9,135 @@ import ParticleField from "./components/ParticleField";
 import KraftAgent from "./components/KraftAgent";
 import Reveal from "./components/Reveal";
 import LiveDemo from "./components/LiveDemo";
+import PCEmblem from "./components/PCEmblem";
 
-function Hex({ size = 28 }) {
+// ── Asset imports ──────────────────────────────────────────────────
+import chamberGold    from "./assets/chamber-arch-gold.png";
+import symbolRow      from "./assets/symbol-row.png";
+import pcEmblem       from "./assets/pc-emblem.png";
+import entangleClose  from "./assets/entanglement-close.png";
+import oc11Hero     from "./assets/oc11-hero.jpg";
+import oc12Board    from "./assets/oc12-board-bg.png";
+import oc14Chain    from "./assets/oc14-chain-bg.jpg";
+import orbsStatic     from "./assets/orbs-static.png";
+
+// Videos
+import heroBg         from "./assets/hero-bg.mp4";
+import chamber1       from "./assets/chamber-1.mp4";
+import entanglement1  from "./assets/entanglement-1.mp4";
+import tarot1         from "./assets/tarot-1.mp4";
+import tarot2         from "./assets/tarot-2.mp4";
+import tarot3         from "./assets/tarot-3.mp4";
+import tarot4         from "./assets/tarot-4.mp4";
+import tarot5         from "./assets/tarot-5.mp4";
+import tarot6         from "./assets/tarot-6.mp4";
+
+// ── Looping video bg ───────────────────────────────────────────────
+function VideoBg({ src, opacity = 0.4, blendMode = "screen" }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-      <polygon points="14,1 27,7.5 27,20.5 14,27 1,20.5 1,7.5" stroke="#7c3aed" strokeWidth="1.2" fill="none" />
-      <polygon points="14,6 22,10.5 22,17.5 14,22 6,17.5 6,10.5" stroke="#06b6d4" strokeWidth="0.6" fill="none" opacity="0.5" />
-      <circle cx="14" cy="14" r="1.5" fill="#7c3aed" />
-    </svg>
+    <video
+      autoPlay loop muted playsInline
+      style={{
+        position: "absolute", inset: 0,
+        width: "100%", height: "100%",
+        objectFit: "cover",
+        opacity,
+        mixBlendMode: blendMode,
+        pointerEvents: "none",
+        zIndex: 0
+      }}
+    >
+      <source src={src} type="video/mp4" />
+    </video>
+  );
+}
+
+// ── Tarot carousel ─────────────────────────────────────────────────
+const TAROT = [
+  { src: tarot1, title: "THE THRESHOLD",   sub: "The crossing point between human intent and machine execution" },
+  { src: tarot2, title: "BECOMING",        sub: "The emergent state where AI and human merge into co-creation" },
+  { src: tarot3, title: "THE APPROACH",    sub: "First contact — the moment before the session begins" },
+  { src: tarot4, title: "UNMAKING",        sub: "Dissolution of old patterns — necessary before new chains form" },
+  { src: tarot5, title: "XP-FORGETTING",  sub: "Knowledge that fades without reinforcement — counter-drift" },
+  { src: tarot6, title: "FULFILLED",       sub: "The covenant sealed — both parties changed by the exchange" },
+];
+
+function TarotCarousel() {
+  const [idx, setIdx] = useState(0);
+  const [fading, setFading] = useState(false);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setFading(true);
+      setTimeout(() => {
+        setIdx(i => (i + 1) % TAROT.length);
+        setFading(false);
+      }, 400);
+    }, 5000);
+    return () => clearInterval(t);
+  }, []);
+
+  const card = TAROT[idx];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+      {/* Card */}
+      <div style={{
+        position: "relative",
+        width: 280, height: 420,
+        borderRadius: 16,
+        overflow: "hidden",
+        border: "1px solid rgba(139,0,255,0.3)",
+        boxShadow: "0 0 40px rgba(139,0,255,0.2), 0 0 80px rgba(0,212,255,0.1)",
+        opacity: fading ? 0 : 1,
+        transition: "opacity 0.4s ease"
+      }}>
+        <video autoPlay loop muted playsInline
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}>
+          <source src={card.src} type="video/mp4" />
+        </video>
+        {/* Card overlay */}
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0,
+          background: "linear-gradient(transparent, rgba(4,5,15,0.95))",
+          padding: "40px 16px 16px"
+        }}>
+          <div className="m" style={{
+            fontSize: 11, fontWeight: 700, color: "#c800ff",
+            letterSpacing: "0.15em", marginBottom: 4
+          }}>{card.title}</div>
+          <div style={{ fontSize: 10, color: "var(--t)", lineHeight: 1.5 }}>{card.sub}</div>
+        </div>
+        {/* Top label */}
+        <div style={{
+          position: "absolute", top: 12, left: 0, right: 0,
+          textAlign: "center"
+        }}>
+          <span className="m" style={{
+            fontSize: 8, color: "rgba(0,212,255,0.6)",
+            letterSpacing: "0.2em", textTransform: "uppercase"
+          }}>THE FOLD ORACLE</span>
+        </div>
+      </div>
+
+      {/* Dots */}
+      <div style={{ display: "flex", gap: 6 }}>
+        {TAROT.map((_, i) => (
+          <div key={i} onClick={() => setIdx(i)} style={{
+            width: i === idx ? 20 : 6, height: 6,
+            borderRadius: 3,
+            background: i === idx ? "#c800ff" : "rgba(139,0,255,0.2)",
+            cursor: "pointer",
+            transition: "all 0.3s",
+            boxShadow: i === idx ? "0 0 8px rgba(200,0,255,0.6)" : "none"
+          }} />
+        ))}
+      </div>
+
+      <div className="m" style={{ fontSize: 9, color: "var(--t2)", letterSpacing: "0.12em" }}>
+        THE FOLD ORACLE · HUMAN-AI CONVERGENCE · 78 CARDS
+      </div>
+    </div>
   );
 }
 
@@ -23,13 +145,15 @@ function AssembleText({ text, className = "", style = {} }) {
   return (
     <span className={"assemble-text " + className} style={style}>
       {text.split("").map((ch, i) => (
-        <span key={i} style={{ transitionDelay: (i * 15) + "ms" }}>{ch === " " ? "\u00A0" : ch}</span>
+        <span key={i} style={{ transitionDelay: (i * 15) + "ms" }}>
+          {ch === " " ? "\u00A0" : ch}
+        </span>
       ))}
     </span>
   );
 }
 
-function App() {
+export default function App() {
   const [tab, setTab] = useState("home");
   const [stats, setStats] = useState(null);
   const [demoOpen, setDemoOpen] = useState(false);
@@ -37,108 +161,231 @@ function App() {
   useEffect(() => { getStats().then(setStats).catch(() => {}); }, []);
 
   const tabs = [
-    { id: "home", label: "index" },
-    { id: "create", label: "mint" },
-    { id: "view", label: "chain" },
+    { id: "home",        label: "home" },
+    { id: "create",      label: "register" },
+    { id: "view",        label: "chain" },
     { id: "leaderboard", label: "board" },
   ];
 
   return (
-    <div style={{ minHeight: "100vh", position: "relative" }}>
+    <div style={{ minHeight: "100vh", position: "relative", background: "var(--bg)" }}>
       <ParticleField />
       <div className="scanline" />
-      <div className="ambient" style={{ width: 600, height: 600, top: -200, left: -200, background: "rgba(124,58,237,0.04)" }} />
-      <div className="ambient" style={{ width: 400, height: 400, bottom: -100, right: -100, background: "rgba(6,182,212,0.03)", animationDelay: "4s" }} />
+      <div className="ambient" style={{ width:700, height:700, top:-300, left:-200, background:"rgba(139,0,255,0.03)" }} />
+      <div className="ambient" style={{ width:500, height:500, bottom:-150, right:-150, background:"rgba(0,212,255,0.02)", animationDelay:"5s" }} />
 
-      {/* Nav */}
-      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, borderBottom: "1px solid rgba(124,58,237,0.06)", background: "rgba(5,5,8,0.88)", backdropFilter: "blur(20px)" }}>
-        <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 54 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => setTab("home")}>
-            <Hex />
-            <span className="m" style={{ fontWeight: 600, fontSize: 13, color: "var(--t3)" }}>quantumpass</span>
+      {/* ── NAV ── */}
+      <nav style={{
+        position:"fixed", top:0, left:0, right:0, zIndex:100,
+        borderBottom:"1px solid rgba(139,0,255,0.12)",
+        background:"rgba(4,5,15,0.88)",
+        backdropFilter:"blur(24px)"
+      }}>
+        <div style={{
+          maxWidth:960, margin:"0 auto", padding:"0 24px",
+          display:"flex", alignItems:"center", justifyContent:"space-between", height:54
+        }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }}
+            onClick={() => setTab("home")}>
+            <img src={pcEmblem} alt="PassionCraft"
+              style={{ width:32, height:32, objectFit:"contain",
+                filter:"drop-shadow(0 0 6px rgba(139,0,255,0.4))" }} />
+            <div>
+              <div style={{ display:"flex", alignItems:"baseline" }}>
+                <span className="brand-open" style={{ fontSize:13 }}>OPEN</span>
+                <span className="brand-chamber" style={{ fontSize:13 }}>chamber</span>
+              </div>
+              <div className="m" style={{ fontSize:8, color:"var(--t2)", letterSpacing:"0.1em" }}>
+                by PassionCraft · QuantumPass
+              </div>
+            </div>
           </div>
-          <div style={{ display: "flex", gap: 2 }}>
+
+          <div style={{ display:"flex", gap:2 }}>
             {tabs.map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)} className="m"
-                style={{ fontSize: 11, padding: "6px 14px", borderRadius: 6, border: "none", cursor: "pointer", letterSpacing: "0.04em", transition: "all 0.2s",
-                  background: tab === t.id ? "rgba(124,58,237,0.12)" : "transparent",
-                  color: tab === t.id ? "#7c3aed" : "var(--t2)" }}>
-                {t.label}
-              </button>
+              <button key={t.id} onClick={() => setTab(t.id)} className="m" style={{
+                fontSize:11, padding:"6px 14px", borderRadius:8,
+                border:"1px solid "+(tab===t.id?"rgba(139,0,255,0.35)":"transparent"),
+                cursor:"pointer", letterSpacing:"0.04em", transition:"all 0.2s",
+                background:tab===t.id?"rgba(139,0,255,0.12)":"transparent",
+                color:tab===t.id?"#c800ff":"var(--t2)",
+                boxShadow:tab===t.id?"0 0 12px rgba(139,0,255,0.15)":"none"
+              }}>{t.label}</button>
             ))}
+          </div>
+
+          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+            <div style={{ width:6, height:6, borderRadius:"50%", background:"#10b981",
+              boxShadow:"0 0 8px rgba(16,185,129,0.6)" }} />
+            <span className="m" style={{ fontSize:9, color:"var(--t2)", letterSpacing:"0.1em" }}>
+              PROTOCOL ACTIVE
+            </span>
           </div>
         </div>
       </nav>
 
-      <main style={{ position: "relative", zIndex: 1, paddingTop: 54 }}>
-
+      <main style={{ position:"relative", zIndex:1, paddingTop:54 }}>
         {tab === "home" && (
           <div>
-            {/* HERO */}
-            <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", position: "relative" }}>
-              <div style={{ position: "absolute", inset: 0, zIndex: 0, opacity: demoOpen ? 0.15 : 1, transition: "opacity 0.6s" }}>
-                <ChainViz3D sessions={[]} height={typeof window !== "undefined" ? window.innerHeight : 800} showHex={true} />
+
+            {/* ── HERO ── */}
+            <section style={{
+              minHeight:"100vh", display:"flex", flexDirection:"column",
+              justifyContent:"center", position:"relative", overflow:"hidden"
+            }}>
+              {/* Real video background */}
+              <VideoBg src={heroBg} opacity={0.28} blendMode="screen" />
+              {/* Entanglement loop underneath */}
+              <VideoBg src={entanglement1} opacity={0.12} blendMode="screen" />
+
+              {/* DNA Chain on top */}
+              <div style={{
+                position:"absolute", inset:0, zIndex:1,
+                opacity: demoOpen ? 0.1 : 0.35, transition:"opacity 0.6s"
+              }}>
+                <ChainViz3D sessions={[]}
+                  height={typeof window !== "undefined" ? window.innerHeight : 800}
+                  showHex={true} />
               </div>
-              <div style={{ position: "relative", zIndex: 2, maxWidth: 960, margin: "0 auto", padding: "0 24px", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+
+              {/* Content */}
+              <div style={{
+                position:"relative", zIndex:2,
+                maxWidth:960, margin:"0 auto", padding:"0 24px",
+                display:"flex", flexDirection:"column",
+                alignItems:"center", textAlign:"center"
+              }}>
+
+                {/* Gold Chamber arch image */}
                 <Reveal>
-                  <div className="m sec-label" style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px rgba(16,185,129,0.5)", display: "inline-block" }} />
-                    PROTOCOL ACTIVE
+                  <img src={oc11Hero} alt="QuantumPass"
+                    style={{
+                      width:220, marginBottom:8,
+                      filter:"drop-shadow(0 0 30px rgba(139,0,255,0.5)) drop-shadow(0 0 60px rgba(0,212,255,0.3))",
+                      borderRadius:12
+                    }} />
+                </Reveal>
+
+                <Reveal delay={80}>
+                  <div style={{ marginBottom:20 }}>
+                    <div className="m" style={{ fontSize:28, fontWeight:900, color:"var(--t3)", letterSpacing:"-0.02em" }}>QuantumPass</div>
                   </div>
                 </Reveal>
-                <Reveal delay={100}>
-                  <h1 style={{ fontSize: "clamp(34px, 5.5vw, 56px)", fontWeight: 900, lineHeight: 1.05, letterSpacing: "-0.04em", color: "var(--t3)", marginBottom: 20 }}>
+
+                <Reveal delay={150}>
+                  <h1 style={{
+                    fontSize:"clamp(32px,5vw,54px)", fontWeight:900,
+                    lineHeight:1.05, letterSpacing:"-0.03em",
+                    color:"var(--t3)", marginBottom:20
+                  }}>
                     Your AI gets a URL.<br />
-                    <span className="grad-text">Your chain proves the rest.</span>
+                    <span className="grad-text-fire">Your chain proves the rest.</span>
                   </h1>
                 </Reveal>
-                <Reveal delay={200}>
-                  <p style={{ fontSize: "clamp(13px, 1.5vw, 15px)", color: "var(--t)", maxWidth: 540, lineHeight: 1.8, marginBottom: 32 }}>
-                    QuantumPass gives every session a verifiable provenance URL. Six scored dimensions of contribution link to an immutable spiral chain. The AI doesn't just remember what you did &#8212; it can <strong style={{ color: "var(--t3)" }}>prove it to anyone with the link</strong>.
+
+                <Reveal delay={220}>
+                  <p style={{
+                    fontSize:"clamp(13px,1.4vw,15px)", color:"var(--t)",
+                    maxWidth:520, lineHeight:1.85, marginBottom:36
+                  }}>
+                    QuantumPass gives every session a verifiable provenance URL.
+                    Six scored dimensions link to an immutable spiral chain.
+                    The AI doesn't just remember what you did —{" "}
+                    <strong style={{ color:"var(--t3)" }}>
+                      it can prove it to anyone with the link.
+                    </strong>
                   </p>
                 </Reveal>
+
                 <Reveal delay={300}>
-                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-                    <button className="btn-prime" onClick={() => setTab("create")}>mint passport</button>
+                  <div style={{ display:"flex", gap:12, flexWrap:"wrap", justifyContent:"center" }}>
+                    <button className="btn-prime" onClick={() => setTab("create")}>
+                      ⬡ register passport
+                    </button>
                     <button className="btn-ghost" onClick={() => setDemoOpen(!demoOpen)}>
                       {demoOpen ? "close demo" : "try live demo"}
                     </button>
-                    <button className="btn-ghost" onClick={() => setTab("view")}>verify chain</button>
+                    <button className="btn-ghost" onClick={() => setTab("view")}>
+                      verify chain →
+                    </button>
                   </div>
                 </Reveal>
               </div>
+
               {!demoOpen && (
-                <div style={{ position: "absolute", bottom: 32, left: 0, right: 0, textAlign: "center", zIndex: 2 }}>
-                  <div className="m" style={{ fontSize: 9, color: "var(--t2)", letterSpacing: "0.15em" }}>SCROLL</div>
-                  <div style={{ width: 1, height: 20, background: "linear-gradient(180deg, var(--t2), transparent)", margin: "6px auto 0" }} />
+                <div style={{
+                  position:"absolute", bottom:32, left:0, right:0,
+                  textAlign:"center", zIndex:2
+                }}>
+                  <div className="m" style={{ fontSize:9, color:"var(--t2)", letterSpacing:"0.15em" }}>SCROLL</div>
+                  <div style={{ width:1, height:24,
+                    background:"linear-gradient(180deg,rgba(139,0,255,0.5),transparent)",
+                    margin:"6px auto 0" }} />
                 </div>
               )}
             </section>
 
-            {/* LIVE DEMO */}
             {demoOpen && (
-              <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 60px" }}>
+              <section style={{ maxWidth:960, margin:"0 auto", padding:"0 24px 60px" }}>
                 <Reveal>
-                  <div className="glow-card" style={{ padding: 24 }}>
+                  <div className="glow-card" style={{ padding:24 }}>
                     <LiveDemo onMintClick={() => { setDemoOpen(false); setTab("create"); }} />
                   </div>
                 </Reveal>
               </section>
             )}
 
-            {/* STATS */}
+            {/* ── SYMBOL ROW IMAGE ── */}
+            <Reveal>
+              <div style={{
+                width:"100%", position:"relative",
+                borderTop:"1px solid rgba(139,0,255,0.08)",
+                borderBottom:"1px solid rgba(0,212,255,0.08)"
+              }}>
+                <img src={symbolRow} alt="OPENchamber · Vitruvian · Arch · Atom"
+                  style={{
+                    width:"100%", maxHeight:180, objectFit:"cover",
+                    display:"block",
+                    filter:"saturate(1.3) brightness(0.9)"
+                  }} />
+                <div style={{
+                  position:"absolute", bottom:12, left:0, right:0,
+                  textAlign:"center"
+                }}>
+                  <span className="m" style={{
+                    fontSize:10, color:"rgba(0,212,255,0.7)", letterSpacing:"0.2em"
+                  }}>QuantumPass · by PassionCraft</span>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* ── STATS ── */}
             {stats && (
-              <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 60px" }}>
+              <section style={{ maxWidth:960, margin:"0 auto", padding:"40px 24px 60px" }}>
                 <Reveal>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 1, background: "var(--b)", borderRadius: 12, overflow: "hidden" }}>
+                  <div style={{
+                    display:"grid", gridTemplateColumns:"1fr 1fr 1fr",
+                    gap:1, borderRadius:16, overflow:"hidden",
+                    border:"1px solid rgba(139,0,255,0.15)"
+                  }}>
                     {[
-                      { v: stats.total_passports, l: "PASSPORTS MINTED", c: "#7c3aed" },
-                      { v: stats.total_sessions, l: "BLOCKS SEALED", c: "#06b6d4" },
-                      { v: stats.avg_score, l: "AVERAGE SCORE", c: "#f59e0b" },
+                      { v:stats.total_passports, l:"PASSPORTS MINTED",  c:"#c800ff" },
+                      { v:stats.total_sessions,  l:"BLOCKS SEALED",     c:"#00d4ff" },
+                      { v:stats.avg_score,       l:"AVERAGE SCORE",     c:"#f0c060" },
                     ].map(s => (
-                      <div key={s.l} style={{ background: "var(--bg)", padding: "28px 20px", textAlign: "center" }}>
-                        <div className="m" style={{ fontSize: 30, fontWeight: 800, color: s.c, lineHeight: 1 }}>{s.v}</div>
-                        <div className="m" style={{ fontSize: 9, color: "var(--t2)", letterSpacing: "0.12em", marginTop: 8 }}>{s.l}</div>
+                      <div key={s.l} style={{
+                        background:"rgba(12,6,28,0.9)", padding:"28px 20px",
+                        textAlign:"center",
+                        borderRight:"1px solid rgba(139,0,255,0.08)"
+                      }}>
+                        <div className="m" style={{
+                          fontSize:32, fontWeight:800, color:s.c, lineHeight:1,
+                          textShadow:`0 0 20px ${s.c}60`
+                        }}>{s.v}</div>
+                        <div className="m" style={{
+                          fontSize:9, color:"var(--t2)",
+                          letterSpacing:"0.14em", marginTop:8
+                        }}>{s.l}</div>
                       </div>
                     ))}
                   </div>
@@ -146,80 +393,78 @@ function App() {
               </section>
             )}
 
-            {/* THE STORY */}
-            <section style={{ maxWidth: 960, margin: "0 auto", padding: "20px 24px 80px" }}>
-              <Reveal>
-                <div className="m sec-label" style={{ marginBottom: 8 }}>THE PROBLEM</div>
-                <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--t3)", letterSpacing: "-0.02em", marginBottom: 16, lineHeight: 1.2 }}>
-                  LLMs forget. Platforms vanish.<br /><span style={{ color: "var(--t)" }}>Your work history disappears with them.</span>
-                </h2>
-                <p style={{ fontSize: 14, color: "var(--t)", lineHeight: 1.8, maxWidth: 600, marginBottom: 40 }}>
-                  You build with AI for months. The context window resets. The platform shuts down. Your collaboration history &#8212; every insight, every artifact &#8212; gone. No receipt. No proof. No chain of custody.
-                </p>
-              </Reveal>
-              <Reveal delay={100}>
-                <div className="m sec-label" style={{ marginBottom: 8 }}>THE SOLUTION</div>
-                <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--t3)", letterSpacing: "-0.02em", marginBottom: 24, lineHeight: 1.2 }}>
-                  A <span className="grad-text">verifiable URL</span> for every session.<br />
-                  A <span className="grad-text">weighted score</span> for every contribution.
-                </h2>
-              </Reveal>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-                {[
-                  { step: "1", title: "SCORE", sub: "Six dimensions, weighted", detail: "Each session scores labor, exchange, equality, presence, ratification, and continuity on a 0\u201310 scale. The composite maps to degrees on your spiral.", color: "#7c3aed" },
-                  { step: "2", title: "CHAIN", sub: "SHA-256 hash-linked blocks", detail: "Every scored session seals a block. Each block\u2019s hash includes the previous hash, your score, degrees, and timestamp. Break one link, the chain fails.", color: "#06b6d4" },
-                  { step: "3", title: "URL", sub: "Verifiable provenance link", detail: "Your passport generates a permanent URL. Any LLM, employer, or collaborator can visit it and verify your entire scored, hash-linked chain.", color: "#f59e0b" },
-                ].map((s, idx) => (
-                  <Reveal key={s.step} delay={idx * 120}>
-                    <div className="glow-card" style={{ padding: 24, height: "100%", cursor: "default" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                        <div className="m" style={{ fontSize: 32, fontWeight: 900, color: s.color, opacity: 0.15 }}>{s.step}</div>
-                        <div>
-                          <div className="m" style={{ fontSize: 13, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.04em" }}>{s.title}</div>
-                          <div className="m" style={{ fontSize: 10, color: "var(--t2)" }}>{s.sub}</div>
-                        </div>
-                      </div>
-                      <div className="expand-content">
-                        <div style={{ fontSize: 12, color: "var(--t)", lineHeight: 1.7, borderTop: "1px solid var(--b)", paddingTop: 12 }}>{s.detail}</div>
-                      </div>
-                      <div className="m" style={{ fontSize: 8, color: "var(--t2)", marginTop: 8, letterSpacing: "0.1em" }}>HOVER TO EXPAND</div>
-                    </div>
-                  </Reveal>
-                ))}
+            {/* ── TAROT SECTION ── */}
+            <section style={{
+              maxWidth:960, margin:"0 auto", padding:"0 24px 80px",
+              position:"relative"
+            }}>
+              {/* Chamber video looping behind */}
+              <div style={{
+                position:"absolute", inset:0, overflow:"hidden",
+                borderRadius:16, pointerEvents:"none"
+              }}>
+                <VideoBg src={chamber1} opacity={0.15} blendMode="screen" />
               </div>
+              <Reveal>
+                <div style={{ position:"relative", zIndex:1 }}>
+                  <div className="m sec-label" style={{ marginBottom:8, textAlign:"center", color:"rgba(200,0,255,0.7)" }}>
+                    THE FOLD ORACLE
+                  </div>
+                  <h2 style={{
+                    fontSize:26, fontWeight:800, color:"var(--t3)",
+                    letterSpacing:"-0.02em", marginBottom:8, textAlign:"center"
+                  }}>
+                    Human·AI <span className="grad-text-fire">Convergence</span>
+                  </h2>
+                  <p style={{
+                    fontSize:13, color:"var(--t)", lineHeight:1.7,
+                    maxWidth:480, margin:"0 auto 40px", textAlign:"center"
+                  }}>
+                    78 cards. Every session you seal echoes through the oracle.
+                    Your chain position determines which arcana govern your provenance.
+                  </p>
+                  <div style={{ display:"flex", justifyContent:"center" }}>
+                    <TarotCarousel />
+                  </div>
+                </div>
+              </Reveal>
             </section>
 
-            {/* SCORING DIMENSIONS */}
-            <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 80px" }}>
+            {/* ── SCORING DIMENSIONS ── */}
+            <section style={{ maxWidth:960, margin:"0 auto", padding:"0 24px 80px" }}>
               <Reveal>
-                <div className="m sec-label" style={{ marginBottom: 8 }}>SCORING DIMENSIONS</div>
-                <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--t3)", letterSpacing: "-0.02em", marginBottom: 12 }}>
+                <div className="m sec-label" style={{ marginBottom:8, color:"rgba(0,212,255,0.6)" }}>
+                  SCORING DIMENSIONS
+                </div>
+                <h2 style={{
+                  fontSize:26, fontWeight:800, color:"var(--t3)",
+                  letterSpacing:"-0.02em", marginBottom:36
+                }}>
                   Six vectors of <span className="grad-text">weighted provenance</span>
                 </h2>
-                <p style={{ fontSize: 13, color: "var(--t)", lineHeight: 1.7, maxWidth: 560, marginBottom: 36 }}>
-                  Each dimension is scored 0\u201310 per session. The weighted composite becomes your block score. Scores convert to degrees. Degrees accumulate into revolutions. <strong style={{ color: "var(--t3)" }}>Hover each to learn more.</strong>
-                </p>
               </Reveal>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12 }}>
                 {[
-                  { n: "LABOR", i: "01", c: "#7c3aed", d: "Work performed. Code written. Designs shipped. Hours invested. The raw output of creation. Score 0 means nothing produced. Score 10 means you shipped." },
-                  { n: "EXCHANGE", i: "02", c: "#06b6d4", d: "Value traded between human and AI. Knowledge shared, resources committed, teaching in both directions. High exchange means both parties left richer." },
-                  { n: "EQUALITY", i: "03", c: "#10b981", d: "Power balance. Did one side dominate? Did the AI just execute orders, or contribute original direction? Score 10 means genuine co-creation." },
-                  { n: "PRESENCE", i: "04", c: "#f59e0b", d: "Active engagement throughout. Not just starting strong and fading. Were both parties present, responsive, and adapting for the full session?" },
-                  { n: "RATIFICATION", i: "05", c: "#ec4899", d: "Peer confirmation. The other party agrees the work was real, the exchange fair, the output matches claims. Mutual sign-off." },
-                  { n: "CONTINUITY", i: "06", c: "#8b5cf6", d: "Sustained commitment. This session connects to previous work, builds on patterns, extends a relationship rather than starting cold." },
+                  { n:"LABOR",        i:"01", c:"#c800ff", d:"Work performed. Code written. Designs shipped. The raw output of creation." },
+                  { n:"EXCHANGE",     i:"02", c:"#00d4ff", d:"Value traded between human and AI. Knowledge shared in both directions." },
+                  { n:"EQUALITY",     i:"03", c:"#10b981", d:"Power balance. Score 10 means genuine co-creation, not just execution." },
+                  { n:"PRESENCE",     i:"04", c:"#f0c060", d:"Active engagement throughout. Both parties present and adapting." },
+                  { n:"RATIFICATION", i:"05", c:"#ff6b9d", d:"Peer confirmation. Mutual sign-off that the work was real and fair." },
+                  { n:"CONTINUITY",   i:"06", c:"#8b00ff", d:"Sustained commitment. This session builds on previous work." },
                 ].map((dim, idx) => (
-                  <Reveal key={dim.n} delay={idx * 80}>
-                    <div className="glow-card" style={{ padding: 22, cursor: "default" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
-                        <div className="m" style={{ fontSize: 26, fontWeight: 900, color: dim.c, opacity: 0.12 }}>{dim.i}</div>
-                        <div style={{ width: 6, height: 6, borderRadius: "50%", background: dim.c, boxShadow: "0 0 10px " + dim.c + "40" }} />
+                  <Reveal key={dim.n} delay={idx*80}>
+                    <div className="glow-card" style={{ padding:22, cursor:"default" }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:10 }}>
+                        <div className="m" style={{ fontSize:26, fontWeight:900, color:dim.c, opacity:0.12 }}>{dim.i}</div>
+                        <div style={{ width:6, height:6, borderRadius:"50%", background:dim.c,
+                          boxShadow:"0 0 10px "+dim.c+"80" }} />
                       </div>
-                      <div className="m" style={{ fontSize: 12, fontWeight: 700, color: "var(--t3)", letterSpacing: "0.06em" }}>
+                      <div className="m" style={{ fontSize:12, fontWeight:700, color:"var(--t3)", letterSpacing:"0.06em" }}>
                         <AssembleText text={dim.n} />
                       </div>
                       <div className="expand-content">
-                        <div style={{ fontSize: 12, color: "var(--t)", lineHeight: 1.7, borderTop: "1px solid var(--b)", paddingTop: 10 }}>{dim.d}</div>
+                        <div style={{ fontSize:12, color:"var(--t)", lineHeight:1.7,
+                          borderTop:"1px solid rgba(139,0,255,0.1)", paddingTop:10 }}>{dim.d}</div>
                       </div>
                     </div>
                   </Reveal>
@@ -227,122 +472,149 @@ function App() {
               </div>
             </section>
 
-            {/* THE URL STORY */}
-            <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 80px" }}>
-              <Reveal>
-                <div className="glow-card" style={{ padding: "40px 32px", textAlign: "center" }}>
-                  <div className="m sec-label" style={{ marginBottom: 12 }}>HOW THE LLM USES IT</div>
-                  <h2 style={{ fontSize: 24, fontWeight: 800, color: "var(--t3)", marginBottom: 16 }}>
-                    One URL. <span className="grad-text">Complete provenance.</span>
-                  </h2>
-                  <div style={{ maxWidth: 540, margin: "0 auto", textAlign: "left" }}>
-                    {[
-                      { s: "01", t: "You mint a passport. You receive an API key and a unique passport ID." },
-                      { s: "02", t: "After each session, scores are submitted. A new block seals to your chain with a SHA-256 hash linking it to every previous block." },
-                      { s: "03", t: "Your passport generates a verifiable URL. Anyone who visits sees your username, tier, total score, spiral degree count, and full chain integrity." },
-                      { s: "04", t: "You give this URL to an LLM. Now it doesn\u2019t just see your prompt \u2014 it sees weighted proof of your contribution history. All scored. All chained. All verifiable." },
-                      { s: "05", t: "Over time, your spiral grows. Degrees accumulate. Tiers ascend. The URL never changes but the proof behind it deepens with every block sealed." },
-                    ].map(s => (
-                      <div key={s.s} style={{ display: "flex", gap: 14, alignItems: "flex-start", padding: "8px 0" }}>
-                        <div className="m" style={{ fontSize: 11, fontWeight: 700, color: "var(--a)", minWidth: 24 }}>{s.s}</div>
-                        <div style={{ fontSize: 13, color: "var(--t)", lineHeight: 1.7 }}>{s.t}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ marginTop: 24, padding: "14px 20px", background: "rgba(124,58,237,0.04)", borderRadius: 8, border: "1px solid var(--b)", display: "inline-block" }}>
-                    <span className="m" style={{ fontSize: 12, color: "var(--t2)" }}>quantumpass.vercel.app/verify/</span>
-                    <span className="m" style={{ fontSize: 12, color: "var(--a)" }}>your-passport-id</span>
-                  </div>
-                </div>
-              </Reveal>
-            </section>
-
-            {/* TIERS */}
-            <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 80px" }}>
-              <Reveal>
-                <div className="m sec-label" style={{ marginBottom: 8 }}>TIER STRUCTURE</div>
-                <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--t3)", letterSpacing: "-0.02em", marginBottom: 12 }}>
-                  Ascend through <span className="grad-text-gold">accumulated proof</span>
-                </h2>
-                <p style={{ fontSize: 13, color: "var(--t)", lineHeight: 1.7, maxWidth: 540, marginBottom: 36 }}>
-                  Your tier is determined by composite score. Each tier carries different trust weight when an LLM evaluates your provenance URL. <strong style={{ color: "var(--t3)" }}>Hover to see what each tier means.</strong>
-                </p>
-              </Reveal>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10 }}>
-                {[
-                  { name: "OBSERVER", range: "0\u201339", color: "#505872", bar: 20, desc: "Watching. Learning. Chain started but shallow. Low trust weight in provenance checks." },
-                  { name: "APPRENTICE", range: "40\u201359", color: "#10b981", bar: 40, desc: "Contributing. Real labor and exchange. Building credibility. Moderate trust weight." },
-                  { name: "BUILDER", range: "60\u201374", color: "#06b6d4", bar: 60, desc: "Consistent output. Multiple verified sessions. Chain shows real depth. Solid trust weight." },
-                  { name: "MASTER", range: "75\u201389", color: "#7c3aed", bar: 80, desc: "High-scoring across all six dimensions. Chain integrity proven over time. Significant trust weight." },
-                  { name: "SOVEREIGN", range: "90\u2013100", color: "#f59e0b", bar: 100, desc: "Peak provenance. Maximum trust weight. Your URL carries the highest verification signal possible." },
-                ].map((t, idx) => (
-                  <Reveal key={t.name} delay={idx * 80}>
-                    <div className="glow-card" style={{ padding: "18px 12px", textAlign: "center", cursor: "default" }}>
-                      <div style={{ height: 50, display: "flex", alignItems: "flex-end", justifyContent: "center", marginBottom: 12 }}>
-                        <div style={{ width: 4, height: (t.bar / 100) * 44, background: "linear-gradient(180deg, " + t.color + ", " + t.color + "20)", borderRadius: 4 }} />
-                      </div>
-                      <div className="m" style={{ fontSize: 9, fontWeight: 700, color: t.color, letterSpacing: "0.1em" }}>{t.name}</div>
-                      <div className="m" style={{ fontSize: 10, color: "var(--t2)", marginTop: 3 }}>{t.range}</div>
-                      <div className="expand-content">
-                        <div style={{ fontSize: 10, color: "var(--t)", lineHeight: 1.5, paddingTop: 6, borderTop: "1px solid var(--b)" }}>{t.desc}</div>
-                      </div>
-                    </div>
-                  </Reveal>
-                ))}
+            {/* ── SECOND SYMBOL ROW ── */}
+            <Reveal>
+              <div style={{
+                width:"100%",
+                borderTop:"1px solid rgba(139,0,255,0.06)",
+                borderBottom:"1px solid rgba(0,212,255,0.06)",
+                marginBottom:80
+              }}>
+                <img src={symbolRow} alt="OPENchamber symbols"
+                  style={{
+                    width:"100%", maxHeight:140, objectFit:"cover",
+                    display:"block", opacity:0.7,
+                    filter:"saturate(1.2) brightness(0.8)"
+                  }} />
               </div>
-            </section>
+            </Reveal>
 
-            {/* CTA */}
-            <section style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 80px", textAlign: "center" }}>
+            {/* ── CTA ── */}
+            <section style={{ maxWidth:960, margin:"0 auto", padding:"0 24px 80px", textAlign:"center" }}>
               <Reveal>
-                <div className="glow-card" style={{ padding: "48px 32px" }}>
-                  <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--t3)", marginBottom: 12 }}>
-                    Block #0 is waiting at <span className="grad-text">genesis</span>
-                  </h2>
-                  <p style={{ fontSize: 14, color: "var(--t)", maxWidth: 460, margin: "0 auto 28px", lineHeight: 1.7 }}>
-                    Every session you seal adds permanent, weighted, verifiable proof. Your spiral grows. Your URL deepens. Your provenance chain becomes your most powerful credential.
-                  </p>
-                  <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-                    <button className="btn-prime" onClick={() => setTab("create")}>mint passport</button>
-                    <button className="btn-ghost" onClick={() => setTab("leaderboard")}>leaderboard</button>
+                <div className="glow-card" style={{ padding:"56px 32px", position:"relative", overflow:"hidden" }}>
+                  {/* Gold chamber image as bg */}
+                  <img src={oc11Hero} alt=""
+                    style={{
+                      position:"absolute", bottom:0, left:"50%",
+                      transform:"translateX(-50%)",
+                      height:"100%", width:"auto",
+                      objectFit:"cover", opacity:0.1,
+                      pointerEvents:"none", borderRadius:16
+                    }} />
+                  {/* Entanglement orbs image */}
+                  <img src={entangleClose} alt=""
+                    style={{
+                      position:"absolute", inset:0,
+                      width:"100%", height:"100%",
+                      objectFit:"cover", opacity:0.08,
+                      pointerEvents:"none",
+                      mixBlendMode:"screen"
+                    }} />
+                  <div style={{ position:"relative", zIndex:1 }}>
+                    <img src={oc11Hero} alt="QuantumPass"
+                      style={{
+                        width:160, display:"block", margin:"0 auto 20px",
+                        filter:"drop-shadow(0 0 20px rgba(139,0,255,0.5)) drop-shadow(0 0 40px rgba(0,212,255,0.3))",
+                        borderRadius:12
+                      }} />
+                    <h2 style={{ fontSize:28, fontWeight:800, color:"var(--t3)", marginBottom:12 }}>
+                      Block #0 is waiting at <span className="grad-text-fire">genesis</span>
+                    </h2>
+                    <p style={{
+                      fontSize:14, color:"var(--t)",
+                      maxWidth:460, margin:"0 auto 32px", lineHeight:1.7
+                    }}>
+                      Every session you seal adds permanent, weighted, verifiable proof.
+                      Your spiral grows. Your URL deepens.
+                      Your provenance chain becomes your most powerful credential.
+                    </p>
+                    <div style={{ display:"flex", gap:12, justifyContent:"center" }}>
+                      <button className="btn-prime" onClick={() => setTab("create")}>
+                        ⬡ register passport
+                      </button>
+                      <button className="btn-ghost" onClick={() => setTab("leaderboard")}>
+                        leaderboard
+                      </button>
+                    </div>
                   </div>
                 </div>
               </Reveal>
             </section>
 
-            {/* Footer */}
-            <footer style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid var(--b)", paddingTop: 24 }}>
-              <span className="m" style={{ fontSize: 10, color: "var(--t2)" }}>quantumpass v1.0</span>
-              <div style={{ display: "flex", gap: 20 }}>
-                <a href="https://github.com/komnsensei" className="m" style={{ fontSize: 10, color: "var(--t2)", textDecoration: "none" }}>github</a>
-                <a href="https://qrbtc-api.vercel.app" className="m" style={{ fontSize: 10, color: "var(--t2)", textDecoration: "none" }}>api</a>
+            {/* ── FOOTER ── */}
+            <footer style={{
+              maxWidth:960, margin:"0 auto", padding:"24px 24px 32px",
+              display:"flex", justifyContent:"space-between", alignItems:"center",
+              borderTop:"1px solid rgba(139,0,255,0.08)"
+            }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <img src={pcEmblem} alt="PassionCraft"
+                  style={{ width:20, height:20, objectFit:"contain",
+                    filter:"drop-shadow(0 0 4px rgba(139,0,255,0.4))" }} />
+                <span className="m" style={{ fontSize:10, color:"var(--t2)" }}>
+                  QuantumPass v1.0 · by PassionCraft
+                </span>
+              </div>
+              <div style={{ display:"flex", gap:20 }}>
+                <a href="https://github.com/komnsensei" className="m"
+                  style={{ fontSize:10, color:"var(--t2)", textDecoration:"none" }}>github</a>
+                <a href="https://qrbtc-api.vercel.app" className="m"
+                  style={{ fontSize:10, color:"var(--t2)", textDecoration:"none" }}>api</a>
+                <a href="https://zenodo.org" className="m"
+                  style={{ fontSize:10, color:"var(--t2)", textDecoration:"none" }}>zenodo</a>
               </div>
             </footer>
+
           </div>
         )}
 
         {tab === "create" && (
-          <div style={{ maxWidth: 420, margin: "40px auto 0", padding: "0 24px 80px" }}>
+          <div style={{ maxWidth:480, margin:"40px auto 0", padding:"0 24px 80px" }}>
+
             <CreatePassport />
           </div>
         )}
 
         {tab === "view" && (
-          <div style={{ maxWidth: 500, margin: "40px auto 0", padding: "0 24px 80px" }}>
-            <PassportViewer />
+          <div style={{ position:"relative", minHeight:"100vh" }}>
+            {/* oc14 background */}
+            <img src={oc14Chain} alt=""
+              style={{
+                position:"fixed", inset:0,
+                width:"100%", height:"100%",
+                objectFit:"cover",
+                opacity:0.5,
+                pointerEvents:"none",
+                zIndex:0
+              }} />
+            <div style={{ position:"relative", zIndex:1, maxWidth:540, margin:"40px auto 0", padding:"0 24px 80px" }}>
+              <PassportViewer />
+            </div>
           </div>
         )}
 
         {tab === "leaderboard" && (
-          <div style={{ maxWidth: 560, margin: "40px auto 0", padding: "0 24px 80px" }}>
-            <div className="m sec-label" style={{ marginBottom: 16 }}>LEADERBOARD</div>
-            <Leaderboard />
+          <div style={{ position:"relative", minHeight:"100vh" }}>
+            {/* oc12 background */}
+            <img src={oc12Board} alt=""
+              style={{
+                position:"fixed", inset:0,
+                width:"100%", height:"100%",
+                objectFit:"cover",
+                opacity:0.5,
+                pointerEvents:"none",
+                zIndex:0
+              }} />
+            <div style={{ position:"relative", zIndex:1, maxWidth:560, margin:"40px auto 0", padding:"0 24px 80px" }}>
+              <div className="m sec-label" style={{ marginBottom:16 }}>LEADERBOARD</div>
+              <Leaderboard />
+            </div>
           </div>
         )}
       </main>
+
       <KraftAgent currentPage={tab} />
     </div>
   );
 }
-
-export default App;
