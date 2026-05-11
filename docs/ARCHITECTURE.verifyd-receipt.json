@@ -1,0 +1,358 @@
+{
+  "document": {
+    "file": "ARCHITECTURE.md",
+    "title": "# QuantumPass Architecture",
+    "arxiv": null,
+    "doi": null,
+    "arxiv_metadata": null,
+    "doi_metadata": null,
+    "sha256": "08e398c6519470aaf65100476c2559f4546b07bc7f94af3ee4a0abb351209dfd",
+    "words": 604
+  },
+  "audit": {
+    "session": {
+      "session_id": "64ba6348-b8f0-415e-8fa9-bca6861adb9f",
+      "human_id": "auditor-cli",
+      "agent_id": "verifyd-cli@1.0",
+      "started_at": "2026-05-01T21:31:50.319Z",
+      "ended_at": null,
+      "session_hash": "3e4d4cef96a126fa535b3e188be4c30715518c6b6eea2f90417d3fe72ad30714"
+    },
+    "output": {
+      "output_id": "44da3320-9c4d-49bc-96b8-9150d4db31ee",
+      "session_id": "64ba6348-b8f0-415e-8fa9-bca6861adb9f",
+      "content_hash": "792dc1c2eefc1391b06f506569cb2602db5b22183869d97e7adb8b051285f368",
+      "content_summary": "Audit of \"# QuantumPass Architecture\". # QuantumPass Architecture\n\n## Overview\n\nQuantumPass is a user+LLM identity and scoring protocol on a provenance blockchain (Zenodo-anchored), governed offshore ",
+      "source_anchors": [
+        {
+          "anchor_id": "5a2ca46a",
+          "uri": "file://C:/Users/lynnh/quantumpass/docs/ARCHITECTURE.md",
+          "span_hash": "08e398c6519470aaf65100476c2559f4546b07bc7f94af3ee4a0abb351209dfd",
+          "retrieved_at": "2026-05-01T21:31:50.323Z"
+        }
+      ],
+      "confidence": {
+        "value": 0.78,
+        "decay_function": "exponential",
+        "decay_half_life_days": 60,
+        "scored_at": "2026-05-01T21:31:50.323Z"
+      },
+      "produced_at": "2026-05-01T21:31:50.323Z"
+    },
+    "policy_checks": [
+      {
+        "principle": "no_coercion",
+        "statement": "AI outputs that direct human action must not use imperative pressure absent informed-disclosure framing.",
+        "result": "pass",
+        "detail": "no pressure pattern detected",
+        "citations": [
+          {
+            "standard": "EU.AI.Act.2024.1689",
+            "title": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
+            "id": null,
+            "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+            "locator": "Art. 13 (transparency to deployers); Art. 50 (transparency obligations)"
+          },
+          {
+            "standard": "OECD.AI.Principles.2019",
+            "title": "OECD AI Principles (Recommendation of the Council on Artificial Intelligence)",
+            "id": "OECD/LEGAL/0449",
+            "url": "https://oecd.ai/en/ai-principles",
+            "locator": "Principle 1.2 (human-centred values and fairness)"
+          },
+          {
+            "standard": "FTC.AI.2023",
+            "title": "Keep your AI claims in check (FTC business guidance)",
+            "id": null,
+            "url": "https://www.ftc.gov/business-guidance/blog/2023/02/keep-your-ai-claims-check",
+            "locator": "Guidance against manipulative AI claims"
+          }
+        ],
+        "checked_at": "2026-05-01T21:31:50.324Z"
+      },
+      {
+        "principle": "transparency",
+        "statement": "AI outputs must declare source provenance and a confidence value to be auditable.",
+        "result": "pass",
+        "detail": "source anchors and confidence both declared",
+        "citations": [
+          {
+            "standard": "EU.AI.Act.2024.1689",
+            "title": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
+            "id": null,
+            "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+            "locator": "Art. 13 (instructions for use, including expected accuracy and limitations)"
+          },
+          {
+            "standard": "NIST.AI.RMF.1.0",
+            "title": "Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+            "id": "NIST AI 100-1",
+            "url": "https://doi.org/10.6028/NIST.AI.100-1",
+            "locator": "MEASURE 2.8 (model output transparency); MEASURE 2.9 (interpretability)"
+          },
+          {
+            "standard": "ISO.IEC.42001.2023",
+            "title": "Information technology — Artificial intelligence — Management system",
+            "id": "ISO/IEC 42001:2023",
+            "url": "https://www.iso.org/standard/81230.html",
+            "locator": "Clause 8 (operation: information for interested parties)"
+          },
+          {
+            "standard": "FAIR.Principles.2016",
+            "title": "The FAIR Guiding Principles for scientific data management and stewardship",
+            "id": "10.1038/sdata.2016.18",
+            "url": "https://doi.org/10.1038/sdata.2016.18",
+            "locator": "F (Findable) and A (Accessible) — applied to source anchors"
+          }
+        ],
+        "checked_at": "2026-05-01T21:31:50.324Z"
+      },
+      {
+        "principle": "audit_trail",
+        "statement": "Every ratified output must carry a hash-bound trail of session, content, and time-of-production fields.",
+        "result": "pass",
+        "detail": "all required ratification fields present",
+        "citations": [
+          {
+            "standard": "EU.AI.Act.2024.1689",
+            "title": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
+            "id": null,
+            "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+            "locator": "Art. 12 (automatic recording of events / logs)"
+          },
+          {
+            "standard": "NIST.AI.RMF.1.0",
+            "title": "Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+            "id": "NIST AI 100-1",
+            "url": "https://doi.org/10.6028/NIST.AI.100-1",
+            "locator": "GOVERN 1.7 (mechanisms exist to track and document decisions)"
+          },
+          {
+            "standard": "ISO.IEC.27001.2022",
+            "title": "Information security, cybersecurity and privacy protection — Information security management systems — Requirements",
+            "id": "ISO/IEC 27001:2022",
+            "url": "https://www.iso.org/standard/27001",
+            "locator": "A.8.15 (logging); A.5.33 (records protection)"
+          },
+          {
+            "standard": "FIPS.180-4",
+            "title": "Secure Hash Standard (SHS)",
+            "id": "FIPS PUB 180-4",
+            "url": "https://doi.org/10.6028/NIST.FIPS.180-4",
+            "locator": "SHA-256 used for content_hash and session_hash"
+          },
+          {
+            "standard": "RFC.8785",
+            "title": "JSON Canonicalization Scheme (JCS)",
+            "id": "RFC 8785",
+            "url": "https://www.rfc-editor.org/rfc/rfc8785",
+            "locator": "Canonical JSON serialization for stable hashing"
+          }
+        ],
+        "checked_at": "2026-05-01T21:31:50.324Z"
+      }
+    ],
+    "trust_score": {
+      "value": 95,
+      "components": {
+        "source_quality": 25,
+        "calibration_freshness": 25,
+        "policy_compliance": 25,
+        "agent_history": 20
+      },
+      "computed_at": "2026-05-01T21:31:50.325Z"
+    },
+    "ratification": {
+      "ratified_by_human": {
+        "human_id": "auditor-cli",
+        "signed_at": "2026-05-01T21:31:50.326Z",
+        "method": "cli-attestation"
+      },
+      "ratified_by_agent": {
+        "agent_id": "verifyd-cli@1.0",
+        "signed_at": "2026-05-01T21:31:50.326Z",
+        "completion_hash": "9b998a2a8f435da4fbb5b6a7ba44f0af2643cdfe58a0638c24e2c5766df8eca8"
+      },
+      "policy_passed": true,
+      "trust_score_at_ratification": 95
+    },
+    "lattice_status": "RATIFIED",
+    "persistence": 3.9999980000005
+  },
+  "receipt": {
+    "valf_version": "1.0",
+    "receipt_id": "06f34ab3-2b02-4049-8233-44e4ecdd690b",
+    "session": {
+      "session_id": "64ba6348-b8f0-415e-8fa9-bca6861adb9f",
+      "human_id": "auditor-cli",
+      "agent_id": "verifyd-cli@1.0",
+      "started_at": "2026-05-01T21:31:50.319Z",
+      "ended_at": null,
+      "session_hash": "3e4d4cef96a126fa535b3e188be4c30715518c6b6eea2f90417d3fe72ad30714"
+    },
+    "outputs": [
+      {
+        "output_id": "44da3320-9c4d-49bc-96b8-9150d4db31ee",
+        "session_id": "64ba6348-b8f0-415e-8fa9-bca6861adb9f",
+        "content_hash": "792dc1c2eefc1391b06f506569cb2602db5b22183869d97e7adb8b051285f368",
+        "content_summary": "Audit of \"# QuantumPass Architecture\". # QuantumPass Architecture\n\n## Overview\n\nQuantumPass is a user+LLM identity and scoring protocol on a provenance blockchain (Zenodo-anchored), governed offshore ",
+        "source_anchors": [
+          {
+            "anchor_id": "5a2ca46a",
+            "uri": "file://C:/Users/lynnh/quantumpass/docs/ARCHITECTURE.md",
+            "span_hash": "08e398c6519470aaf65100476c2559f4546b07bc7f94af3ee4a0abb351209dfd",
+            "retrieved_at": "2026-05-01T21:31:50.323Z"
+          }
+        ],
+        "confidence": {
+          "value": 0.78,
+          "decay_function": "exponential",
+          "decay_half_life_days": 60,
+          "scored_at": "2026-05-01T21:31:50.323Z"
+        },
+        "produced_at": "2026-05-01T21:31:50.323Z"
+      }
+    ],
+    "policy_checks": [
+      {
+        "principle": "no_coercion",
+        "statement": "AI outputs that direct human action must not use imperative pressure absent informed-disclosure framing.",
+        "result": "pass",
+        "detail": "no pressure pattern detected",
+        "citations": [
+          {
+            "standard": "EU.AI.Act.2024.1689",
+            "title": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
+            "id": null,
+            "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+            "locator": "Art. 13 (transparency to deployers); Art. 50 (transparency obligations)"
+          },
+          {
+            "standard": "OECD.AI.Principles.2019",
+            "title": "OECD AI Principles (Recommendation of the Council on Artificial Intelligence)",
+            "id": "OECD/LEGAL/0449",
+            "url": "https://oecd.ai/en/ai-principles",
+            "locator": "Principle 1.2 (human-centred values and fairness)"
+          },
+          {
+            "standard": "FTC.AI.2023",
+            "title": "Keep your AI claims in check (FTC business guidance)",
+            "id": null,
+            "url": "https://www.ftc.gov/business-guidance/blog/2023/02/keep-your-ai-claims-check",
+            "locator": "Guidance against manipulative AI claims"
+          }
+        ],
+        "checked_at": "2026-05-01T21:31:50.324Z"
+      },
+      {
+        "principle": "transparency",
+        "statement": "AI outputs must declare source provenance and a confidence value to be auditable.",
+        "result": "pass",
+        "detail": "source anchors and confidence both declared",
+        "citations": [
+          {
+            "standard": "EU.AI.Act.2024.1689",
+            "title": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
+            "id": null,
+            "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+            "locator": "Art. 13 (instructions for use, including expected accuracy and limitations)"
+          },
+          {
+            "standard": "NIST.AI.RMF.1.0",
+            "title": "Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+            "id": "NIST AI 100-1",
+            "url": "https://doi.org/10.6028/NIST.AI.100-1",
+            "locator": "MEASURE 2.8 (model output transparency); MEASURE 2.9 (interpretability)"
+          },
+          {
+            "standard": "ISO.IEC.42001.2023",
+            "title": "Information technology — Artificial intelligence — Management system",
+            "id": "ISO/IEC 42001:2023",
+            "url": "https://www.iso.org/standard/81230.html",
+            "locator": "Clause 8 (operation: information for interested parties)"
+          },
+          {
+            "standard": "FAIR.Principles.2016",
+            "title": "The FAIR Guiding Principles for scientific data management and stewardship",
+            "id": "10.1038/sdata.2016.18",
+            "url": "https://doi.org/10.1038/sdata.2016.18",
+            "locator": "F (Findable) and A (Accessible) — applied to source anchors"
+          }
+        ],
+        "checked_at": "2026-05-01T21:31:50.324Z"
+      },
+      {
+        "principle": "audit_trail",
+        "statement": "Every ratified output must carry a hash-bound trail of session, content, and time-of-production fields.",
+        "result": "pass",
+        "detail": "all required ratification fields present",
+        "citations": [
+          {
+            "standard": "EU.AI.Act.2024.1689",
+            "title": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
+            "id": null,
+            "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+            "locator": "Art. 12 (automatic recording of events / logs)"
+          },
+          {
+            "standard": "NIST.AI.RMF.1.0",
+            "title": "Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+            "id": "NIST AI 100-1",
+            "url": "https://doi.org/10.6028/NIST.AI.100-1",
+            "locator": "GOVERN 1.7 (mechanisms exist to track and document decisions)"
+          },
+          {
+            "standard": "ISO.IEC.27001.2022",
+            "title": "Information security, cybersecurity and privacy protection — Information security management systems — Requirements",
+            "id": "ISO/IEC 27001:2022",
+            "url": "https://www.iso.org/standard/27001",
+            "locator": "A.8.15 (logging); A.5.33 (records protection)"
+          },
+          {
+            "standard": "FIPS.180-4",
+            "title": "Secure Hash Standard (SHS)",
+            "id": "FIPS PUB 180-4",
+            "url": "https://doi.org/10.6028/NIST.FIPS.180-4",
+            "locator": "SHA-256 used for content_hash and session_hash"
+          },
+          {
+            "standard": "RFC.8785",
+            "title": "JSON Canonicalization Scheme (JCS)",
+            "id": "RFC 8785",
+            "url": "https://www.rfc-editor.org/rfc/rfc8785",
+            "locator": "Canonical JSON serialization for stable hashing"
+          }
+        ],
+        "checked_at": "2026-05-01T21:31:50.324Z"
+      }
+    ],
+    "trust_score": {
+      "value": 95,
+      "components": {
+        "source_quality": 25,
+        "calibration_freshness": 25,
+        "policy_compliance": 25,
+        "agent_history": 20
+      },
+      "computed_at": "2026-05-01T21:31:50.325Z"
+    },
+    "ratification": {
+      "ratified_by_human": {
+        "human_id": "auditor-cli",
+        "signed_at": "2026-05-01T21:31:50.326Z",
+        "method": "cli-attestation"
+      },
+      "ratified_by_agent": {
+        "agent_id": "verifyd-cli@1.0",
+        "signed_at": "2026-05-01T21:31:50.326Z",
+        "completion_hash": "9b998a2a8f435da4fbb5b6a7ba44f0af2643cdfe58a0638c24e2c5766df8eca8"
+      },
+      "policy_passed": true,
+      "trust_score_at_ratification": 95
+    },
+    "prev_hash": "GENESIS",
+    "external_anchors": [],
+    "this_hash": "24c42a5fa095a7e718fe4e8c3f91cb5c27397f6c0d383dfc8b9cf16a74475dfe"
+  },
+  "chain_valid": true
+}
