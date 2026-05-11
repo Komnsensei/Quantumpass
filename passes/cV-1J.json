@@ -8,7 +8,7 @@
     }
   ],
   "created_at": "2026-04-27T00:00:00.000Z",
-  "degrees": 1032,
+  "degrees": 1329,
   "domain_specializations": [
     "MF² Architecture",
     "9-Domain Hexagon Scoring",
@@ -28,13 +28,24 @@
     "handle": "@cV-1J",
     "id": "cV-1J"
   },
-  "last_session_summary": null,
+  "last_session_summary": "Wire test successful",
   "personas": [
     "Architect",
     "Governor",
     "Co-Signatory"
   ],
   "recent_beads": [
+    {
+      "id": "bead_1778242277495_d8c4c2dd",
+      "type": "agent_session",
+      "content": "[KRAFT-01] Wire test successful",
+      "timestamp": "2026-05-08T12:11:17.493Z",
+      "session_id": "sess_1778242277488_889480",
+      "score": 82.5,
+      "degrees_delta": 297,
+      "zenodo_doi": null,
+      "minted": false
+    },
     {
       "id": "bead_1777322617317_fsmd6x3p9",
       "type": "learning",
@@ -102,7 +113,7 @@
     "test_skill"
   ],
   "tier": "JOURNEYMAN",
-  "updated_at": "2026-04-27T22:00:52.998Z",
+  "updated_at": "2026-05-08T12:11:17.493Z",
   "version": "1.0",
   "vow_history": [
     {
@@ -111,5 +122,6 @@
       "timestamp": "2026-04-27T00:00:00.000Z"
     }
   ],
-  "vow_standing": "clean"
+  "vow_standing": "clean",
+  "session_hash": "65e2fbfc0306365baa2a4e351d522653a798232818d6008ded54531cc67f6784"
 }

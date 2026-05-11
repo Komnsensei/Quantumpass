@@ -1,11 +1,11 @@
-
+﻿
 import { useState } from "react";
 import { createPassport, createApiKey, getPassport, verifyChain, getHistory, getTier } from "../api";
 import ChainViz3D from "./ChainViz3D";
 import SpiralViz from "./SpiralViz";
 import newBanner from "../assets/new-banner.png";
 
-const EXT_CHROME_URL = "https://chrome.google.com/webstore/detail/passioncraft-vibesafe/pending";
+const EXT_CHROME_URL = "https://github.com/komnsensei/quantumpass/releases/latest"; // v0.4.0 live
 
 export default function CreatePassport() {
   const [step, setStep] = useState(0);
@@ -79,7 +79,7 @@ export default function CreatePassport() {
   const progress = step / 4;
   const stepLabels = ["username", "zenodo", "extension", "api key", "passport"];
 
-  // Banner — always at top
+  // Banner â€” always at top
   const Banner = () => (
     <div style={{ marginBottom: 28, borderRadius: 12, overflow: "hidden",
       boxShadow: "0 0 40px rgba(139,0,255,0.2)" }}>
@@ -118,7 +118,7 @@ export default function CreatePassport() {
           </div>
           {chain && (
             <div className="m" style={{ fontSize: 10, marginTop: 12, color: chain.chain_intact ? "#10b981" : "#ef4444" }}>
-              {chain.chain_intact ? "✓ CHAIN INTACT" : "✗ CHAIN BROKEN"}
+              {chain.chain_intact ? "âœ“ CHAIN INTACT" : "âœ— CHAIN BROKEN"}
             </div>
           )}
         </div>
@@ -127,7 +127,7 @@ export default function CreatePassport() {
           <div className="m" style={{ fontSize: 9, color: "var(--a)", letterSpacing: "0.12em", marginBottom: 6 }}>API KEY</div>
           <div className="m" style={{ fontSize: 10, color: "#f59e0b", wordBreak: "break-all", lineHeight: 1.6 }}>{result?.api_key}</div>
           <button className="btn-ghost" style={{ marginTop: 10, fontSize: 10, padding: "5px 14px" }} onClick={copyKey}>
-            {copied ? "✓ copied" : "copy"}
+            {copied ? "âœ“ copied" : "copy"}
           </button>
         </div>
       </div>
@@ -175,10 +175,10 @@ export default function CreatePassport() {
             onKeyDown={e => e.key === "Enter" && username.trim() && setStep(1)}
             maxLength={32} />
           <button className="btn-prime" onClick={() => setStep(1)} disabled={!username.trim()}>
-            continue →
+            continue â†’
           </button>
           <div className="m" style={{ fontSize: 9, color: "var(--t2)", textAlign: "center", letterSpacing: "0.06em" }}>
-            FREE · NO EMAIL · ZENODO REQUIRED
+            FREE Â· NO EMAIL Â· ZENODO REQUIRED
           </div>
         </div>
       )}
@@ -188,7 +188,7 @@ export default function CreatePassport() {
         <div className="glow-card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
             <div className="m" style={{ fontSize: 16, fontWeight: 700, color: "var(--t3)", marginBottom: 4 }}>
-              {zenodoVerified ? "✓ zenodo verified" : "link zenodo · gate 1 of 2"}
+              {zenodoVerified ? "âœ“ zenodo verified" : "link zenodo Â· gate 1 of 2"}
             </div>
             <div style={{ fontSize: 11, color: "var(--t2)", lineHeight: 1.6 }}>
               Zenodo anchors your session provenance to permanent citable DOIs.
@@ -202,7 +202,7 @@ export default function CreatePassport() {
                 fontSize: 11, color: "var(--t)", lineHeight: 1.6 }}>
                 <strong style={{ color: "var(--t3)" }}>Get your token:</strong><br/>
                 1. <a href="https://zenodo.org/account/settings/applications/tokens/new/"
-                  target="_blank" style={{ color: "#00d4ff" }}>zenodo.org → Account → Applications → New Token</a><br/>
+                  target="_blank" style={{ color: "#00d4ff" }}>zenodo.org â†’ Account â†’ Applications â†’ New Token</a><br/>
                 2. Enable <strong style={{ color: "var(--t3)" }}>deposit:write</strong> scope<br/>
                 3. Paste below
               </div>
@@ -213,7 +213,7 @@ export default function CreatePassport() {
               {zenodoError && <div className="m" style={{ fontSize: 11, color: "#ef4444" }}>{zenodoError}</div>}
               <button className="btn-prime" onClick={verifyZenodo}
                 disabled={zenodoLoading || !zenodoToken.trim()}>
-                {zenodoLoading ? "verifying..." : "verify zenodo token →"}
+                {zenodoLoading ? "verifying..." : "verify zenodo token â†’"}
               </button>
             </>
           ) : (
@@ -222,11 +222,11 @@ export default function CreatePassport() {
               display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#10b981" }} />
               <span className="m" style={{ fontSize: 11, color: "#10b981" }}>
-                Zenodo verified · deposit:write confirmed
+                Zenodo verified Â· deposit:write confirmed
               </span>
             </div>
           )}
-          <button className="btn-ghost" style={{ fontSize: 10 }} onClick={() => setStep(0)}>← back</button>
+          <button className="btn-ghost" style={{ fontSize: 10 }} onClick={() => setStep(0)}>â† back</button>
         </div>
       )}
 
@@ -235,7 +235,7 @@ export default function CreatePassport() {
         <div className="glow-card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
             <div className="m" style={{ fontSize: 16, fontWeight: 700, color: "var(--t3)", marginBottom: 4 }}>
-              install vibesafe · gate 2 of 2
+              install vibesafe Â· gate 2 of 2
             </div>
             <div style={{ fontSize: 11, color: "var(--t2)", lineHeight: 1.6 }}>
               VIBEsafe monitors your AI conversations, scores manipulation patterns,
@@ -245,13 +245,13 @@ export default function CreatePassport() {
           <div style={{ padding: 16, background: "rgba(139,0,255,0.04)", borderRadius: 10,
             border: "1px solid rgba(139,0,255,0.15)", display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ fontSize: 28 }}>⬡</div>
+              <div style={{ fontSize: 28 }}>â¬¡</div>
               <div>
                 <div className="m" style={{ fontSize: 13, fontWeight: 700, color: "var(--t3)" }}>
                   QuantumPass VIBEsafe
                 </div>
                 <div style={{ fontSize: 10, color: "var(--t2)" }}>
-                  Chrome Extension · Real-time AI session governance
+                  Chrome Extension Â· Real-time AI session governance
                 </div>
               </div>
             </div>
@@ -265,27 +265,40 @@ export default function CreatePassport() {
                 "Privacy-first"
               ].map(f => (
                 <div key={f} style={{ display: "flex", gap: 6, fontSize: 10, color: "var(--t)" }}>
-                  <span style={{ color: "#10b981" }}>✓</span> {f}
+                  <span style={{ color: "#10b981" }}>âœ“</span> {f}
                 </div>
               ))}
             </div>
-            <a href={EXT_CHROME_URL} target="_blank" rel="noreferrer">
-              <button className="btn-prime" style={{ width: "100%" }}>↓ Install Extension</button>
-            </a>
+            <div style={{ padding: "14px 16px", background: "rgba(139,0,255,0.06)", border: "1px solid rgba(139,0,255,0.3)", borderRadius: 10, textAlign: "center" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#8b00ff", marginBottom: 6 }}>⬡ VIBEsafe Extension v0.4.0</div>
+              <div style={{ fontSize: 10, color: "var(--t2)", lineHeight: 1.6, marginBottom: 10 }}>
+                22 LLM platforms · Live trust scoring · Auto identity injection<br/>
+                Load unpacked in Chrome → Developer mode → Select folder
+              </div>
+              <a
+                href="https://quantumpassai.vercel.app/vibesafe-v0.4.0.zip"
+                download
+                style={{ display: "inline-block", padding: "8px 18px", background: "linear-gradient(135deg,#8b00ff,#6b00cc)", color: "#fff", borderRadius: 8, fontSize: 11, fontWeight: 600, textDecoration: "none", marginBottom: 6 }}
+              >↓ Download Extension (.zip)</a>
+              <div style={{ fontSize: 9, color: "var(--t2)", marginTop: 4 }}>
+                Chrome Web Store submission in progress · Manual install works now
+              </div>
+            </div>
+
           </div>
           <label style={{ display: "flex", gap: 10, alignItems: "flex-start", cursor: "pointer" }}>
             <input type="checkbox" checked={extConfirmed}
               onChange={e => setExtConfirmed(e.target.checked)}
               style={{ marginTop: 2, accentColor: "#8b00ff", width: 14, height: 14 }} />
             <span style={{ fontSize: 11, color: "var(--t)", lineHeight: 1.5 }}>
-              I've installed VIBEsafe and am ready to begin
+              Skip — I’ll install the extension after minting
             </span>
           </label>
           {error && <div className="m" style={{ fontSize: 11, color: "#ef4444" }}>{error}</div>}
           <button className="btn-prime" onClick={handleCreate} disabled={loading || !extConfirmed}>
-            {loading ? "minting passport..." : "⬡ mint passport & issue api key →"}
+            {loading ? "minting passport..." : "â¬¡ mint passport & issue api key â†’"}
           </button>
-          <button className="btn-ghost" style={{ fontSize: 10 }} onClick={() => setStep(1)}>← back</button>
+          <button className="btn-ghost" style={{ fontSize: 10 }} onClick={() => setStep(1)}>â† back</button>
         </div>
       )}
 
@@ -293,7 +306,7 @@ export default function CreatePassport() {
       {step === 3 && result && (
         <div className="glow-card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>⬡</div>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>â¬¡</div>
             <div className="m" style={{ fontSize: 16, fontWeight: 700, color: "#10b981", marginBottom: 4 }}>
               passport minted
             </div>
@@ -313,7 +326,7 @@ export default function CreatePassport() {
             ))}
             <div>
               <div className="m" style={{ fontSize: 9, color: "var(--t2)", letterSpacing: "0.12em", marginBottom: 6 }}>
-                API KEY · SHOWN ONCE
+                API KEY Â· SHOWN ONCE
               </div>
               <div style={{ padding: "12px 14px", background: "rgba(245,158,11,0.04)",
                 border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, position: "relative" }}>
@@ -328,7 +341,7 @@ export default function CreatePassport() {
                   borderRadius: 6, padding: "4px 10px", cursor: "pointer",
                   color: copied ? "#10b981" : "#f59e0b", fontSize: 10, fontFamily: "monospace"
                 }}>
-                  {copied ? "✓" : "copy"}
+                  {copied ? "âœ“" : "copy"}
                 </button>
               </div>
             </div>
@@ -338,14 +351,16 @@ export default function CreatePassport() {
             fontSize: 11, color: "var(--t)", lineHeight: 1.6 }}>
             <strong style={{ color: "var(--t3)" }}>Next:</strong><br/>
             1. Copy API key above<br/>
-            2. Open VIBEsafe extension → paste key + Zenodo token<br/>
-            3. Visit any LLM — chain starts automatically
+            2. Open VIBEsafe extension â†’ paste key + Zenodo token<br/>
+            3. Visit any LLM â€” chain starts automatically
           </div>
           <button className="btn-prime" onClick={handleView} disabled={viewLoading}>
-            {viewLoading ? "loading..." : "view my passport →"}
+            {viewLoading ? "loading..." : "view my passport â†’"}
           </button>
         </div>
       )}
     </div>
   );
 }
+
+

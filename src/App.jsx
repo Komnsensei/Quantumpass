@@ -1,5 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
+import VibeSafeBeacon from "./components/VibeSafeBeacon";
+import InvestorSection from "./components/InvestorSection";
 import { getStats } from "./api";
 import CreatePassport from "./components/CreatePassport";
 import PassportViewer from "./components/PassportViewer";
@@ -165,11 +167,13 @@ export default function App() {
     { id: "create",      label: "register" },
     { id: "view",        label: "chain" },
     { id: "leaderboard", label: "board" },
+    { id: "investor",    label: "invest" },
   ];
 
   return (
     <div style={{ minHeight: "100vh", position: "relative", background: "var(--bg)" }}>
       <ParticleField />
+      <VibeSafeBeacon state="green" position="global" />
       <div className="scanline" />
       <div className="ambient" style={{ width:700, height:700, top:-300, left:-200, background:"rgba(139,0,255,0.03)" }} />
       <div className="ambient" style={{ width:500, height:500, bottom:-150, right:-150, background:"rgba(0,212,255,0.02)", animationDelay:"5s" }} />
@@ -591,6 +595,12 @@ export default function App() {
             <div style={{ position:"relative", zIndex:1, maxWidth:540, margin:"40px auto 0", padding:"0 24px 80px" }}>
               <PassportViewer />
             </div>
+          </div>
+        )}
+
+        {tab === "investor" && (
+          <div style={{ maxWidth:960, margin:"40px auto 0" }}>
+            <InvestorSection onRegister={() => setTab("create")} />
           </div>
         )}
 
