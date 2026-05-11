@@ -1,128 +1,173 @@
-﻿import { useRef, useMemo, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Line, Float } from "@react-three/drei";
-import * as THREE from "three";
+﻿import { useRef, useEffect, useMemo } from "react";
 
-function Block({ position, score, index, total, isLatest }) {
-  const ref = useRef();
-  const [hov, setHov] = useState(false);
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
-  const color = score >= 90 ? "#f59e0b" : score >= 75 ? "#7c3aed" : score >= 60 ? "#06b6d4" : score >= 40 ? "#10b981" : "#2a2e3a";
-  const sc = hov ? 1.4 : isLatest ? 1.1 : 0.6 + (index / total) * 0.4;
+export default function ChainViz3D({ sessions = [], height = 400 }) {
+  const canvasRef = useRef(null);
+  const stateRef  = useRef({ rot: 0, t: 0, raf: null, alive: true });
 
-  useFrame(() => {
-    if (ref.current) ref.current.rotation.y += 0.005;
-  });
-
-  return (
-    <group position={position}>
-      <mesh ref={ref} scale={sc} onPointerOver={() => setHov(true)} onPointerOut={() => setHov(false)}>
-        <icosahedronGeometry args={[0.15, 0]} />
-        <meshStandardMaterial
-          color={color} emissive={color}
-          emissiveIntensity={hov ? 1.2 : isLatest ? 0.6 : 0.1}
-          transparent opacity={hov ? 0.95 : 0.5 + (index / total) * 0.5}
-          roughness={0.2} metalness={0.8}
-        />
-      </mesh>
-      {(hov || isLatest) && (
-        <pointLight color={color} intensity={hov ? 1.5 : 0.4} distance={hov ? 3 : 1.5} />
-      )}
-    </group>
-  );
-}
-
-function ChainSpiral({ sessions }) {
-  const groupRef = useRef();
-  useFrame((s) => { if (groupRef.current) groupRef.current.rotation.y += 0.0008; });
-
-  const points = useMemo(() => {
-    return sessions.map((s, i) => {
-      const t = i / Math.max(sessions.length - 1, 1);
-      const angle = t * Math.PI * 2 * Math.max(sessions.length / 3, 1);
-      const radius = 0.3 + t * 2.2;
-      const height = t * 3.5 - 1.75;
-      return [radius * Math.cos(angle), height, radius * Math.sin(angle)];
-    });
+  const demo = useMemo(() => {
+    if (sessions.length > 0) return sessions;
+    return Array.from({ length: 12 }, (_, i) => ({
+      id: "d" + i,
+      score: 25 + Math.floor(Math.random() * 70),
+    }));
   }, [sessions]);
 
-  const curve = useMemo(() => {
-    if (points.length < 2) return null;
-    const c = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(...p)));
-    return c.getPoints(points.length * 30).map(p => [p.x, p.y, p.z]);
-  }, [points]);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const state = stateRef.current;
+    state.alive = true;
 
-  return (
-    <group ref={groupRef}>
-      {curve && <Line points={curve} color="#7c3aed" lineWidth={1.5} transparent opacity={0.15} />}
-      {sessions.map((s, i) => (
-        <Block key={s.id || i} position={points[i]} score={s.score} index={i} total={sessions.length} isLatest={i === sessions.length - 1} />
-      ))}
-      <mesh position={[0, -1.75, 0]}>
-        <octahedronGeometry args={[0.04, 0]} />
-        <meshStandardMaterial color="#2a2e3a" emissive="#7c3aed" emissiveIntensity={0.2} />
-      </mesh>
-    </group>
-  );
-}
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.offsetWidth;
+    const H = height;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width  = W + "px";
+    canvas.style.height = H + "px";
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    const cx = W / 2, cy = H / 2;
 
-function GridFloor() {
-  const lines = useMemo(() => {
-    const l = [];
-    for (let i = -5; i <= 5; i++) {
-      l.push([[-5, -2.2, i], [5, -2.2, i]]);
-      l.push([[i, -2.2, -5], [i, -2.2, 5]]);
+    const COLORS = ["#2a2e3a","#10b981","#06b6d4","#7c3aed","#f59e0b"];
+    function scoreColor(s) {
+      if (s >= 90) return COLORS[4];
+      if (s >= 75) return COLORS[3];
+      if (s >= 60) return COLORS[2];
+      if (s >= 40) return COLORS[1];
+      return COLORS[0];
     }
-    return l;
-  }, []);
-  return <>{lines.map((p, i) => <Line key={i} points={p} color="#7c3aed" lineWidth={0.3} transparent opacity={0.04} />)}</>;
-}
 
-function FloatingHex() {
-  const ref = useRef();
-  useFrame((s) => {
-    ref.current.rotation.x = Math.sin(s.clock.elapsedTime * 0.3) * 0.1;
-    ref.current.rotation.z = Math.cos(s.clock.elapsedTime * 0.2) * 0.05;
-  });
+    function draw() {
+      if (!state.alive) return;
+      try {
+        ctx.clearRect(0, 0, W, H);
+
+        // Ambient
+        const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.7);
+        bg.addColorStop(0, "rgba(124,58,237,0.04)");
+        bg.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        const n = demo.length;
+        const spiralPts = demo.map((s, i) => {
+          const t     = i / Math.max(n - 1, 1);
+          const angle = t * Math.PI * 2 * Math.max(n / 3, 1) + state.rot;
+          const radius = (0.08 + t * 0.28) * Math.min(W, H);
+          const yOff   = (t - 0.5) * H * 0.72;
+          // project 3D spiral onto 2D with fake perspective
+          const cosR = Math.cos(state.rot * 0.4);
+          const x    = cx + Math.cos(angle) * radius * cosR;
+          const y    = cy + yOff + Math.sin(angle) * radius * 0.18;
+          const z    = Math.sin(angle); // -1..1 depth
+          return { x, y, z, score: s.score, i, t };
+        });
+
+        // Grid lines
+        for (let i = -6; i <= 6; i++) {
+          const gx = cx + (i / 6) * W * 0.48;
+          ctx.beginPath();
+          ctx.moveTo(gx, cy - H * 0.5);
+          ctx.lineTo(gx, cy + H * 0.5);
+          ctx.strokeStyle = "rgba(124,58,237,0.04)";
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(cx - W * 0.5, cy + (i / 6) * H * 0.48);
+          ctx.lineTo(cx + W * 0.5, cy + (i / 6) * H * 0.48);
+          ctx.stroke();
+        }
+
+        // Spiral curve
+        if (spiralPts.length > 1) {
+          ctx.beginPath();
+          ctx.moveTo(spiralPts[0].x, spiralPts[0].y);
+          for (let i = 1; i < spiralPts.length; i++) {
+            ctx.lineTo(spiralPts[i].x, spiralPts[i].y);
+          }
+          ctx.strokeStyle = "rgba(124,58,237,0.15)";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+
+        // Blocks sorted back-to-front
+        const sorted = [...spiralPts].sort((a, b) => a.z - b.z);
+        sorted.forEach(pt => {
+          const color = scoreColor(pt.score);
+          const isLatest = pt.i === n - 1;
+          const depth  = clamp((pt.z + 1) / 2, 0.1, 1);
+          const dotR   = clamp((isLatest ? 10 : 5) * depth, 2, 14);
+          const alpha  = clamp(0.3 + depth * 0.7, 0, 1);
+
+          // Glow
+          const g = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, dotR * 3);
+          g.addColorStop(0, color + Math.round(alpha * 80).toString(16).padStart(2, "0"));
+          g.addColorStop(1, color + "00");
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, dotR * 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Dot
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, dotR, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.globalAlpha = alpha;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+
+          // Pulse latest
+          if (isLatest) {
+            const pulse = (Math.sin(state.t * 2.5) + 1) / 2;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, dotR + 4 + pulse * 8, 0, Math.PI * 2);
+            ctx.strokeStyle = color + Math.round((0.6 - pulse * 0.5) * 255).toString(16).padStart(2, "0");
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+        });
+
+        // Hex rings center
+        for (let ring = 0; ring < 3; ring++) {
+          const rr = (30 + ring * 22) * (1 + Math.sin(state.t * 0.4 + ring) * 0.04);
+          ctx.beginPath();
+          for (let s = 0; s <= 6; s++) {
+            const a = (s / 6) * Math.PI * 2 - Math.PI / 6;
+            const hx = cx + Math.cos(a) * rr;
+            const hy = cy + Math.sin(a) * rr;
+            s === 0 ? ctx.moveTo(hx, hy) : ctx.lineTo(hx, hy);
+          }
+          ctx.strokeStyle = `rgba(124,58,237,${(0.08 - ring * 0.02).toFixed(3)})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+
+        state.rot += 0.004;
+        state.t   += 0.03;
+      } catch(e) {
+        console.error("ChainViz draw error:", e);
+      }
+      state.raf = requestAnimationFrame(draw);
+    }
+
+    draw();
+    return () => {
+      state.alive = false;
+      cancelAnimationFrame(state.raf);
+    };
+  }, [demo, height]);
+
   return (
-    <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.5}>
-      <group ref={ref}>
-        {[2.5, 2.0, 1.5].map((r, i) => (
-          <mesh key={i} rotation={[0, (i * Math.PI) / 6, 0]}>
-            <torusGeometry args={[r, 0.008, 6, 6]} />
-            <meshStandardMaterial color="#7c3aed" emissive="#7c3aed" emissiveIntensity={0.3 - i * 0.08} transparent opacity={0.12 - i * 0.03} />
-          </mesh>
-        ))}
-      </group>
-    </Float>
-  );
-}
-
-export default function ChainViz3D({ sessions = [], height = 400, showHex = false }) {
-  const hasSessions = sessions.length > 0;
-  const demo = useMemo(() => {
-    if (hasSessions) return sessions;
-    return Array.from({ length: 12 }, (_, i) => ({
-      id: "d" + i, score: 25 + Math.floor(Math.random() * 70),
-      degrees_delta: 80 + Math.random() * 250, session_hash: "0".repeat(64)
-    }));
-  }, [sessions, hasSessions]);
-
-  return (
-    <div style={{ width: "100%", height, position: "relative", borderRadius: 14, overflow: "hidden", background: "radial-gradient(ellipse at center, rgba(124,58,237,0.03), transparent 70%)" }}>
-      <Canvas camera={{ position: [3.5, 2, 4.5], fov: 40 }} style={{ background: "transparent" }}>
-        <ambientLight intensity={0.15} />
-        <pointLight position={[5, 5, 5]} intensity={0.3} color="#7c3aed" />
-        <pointLight position={[-4, -2, -4]} intensity={0.15} color="#06b6d4" />
-        <pointLight position={[0, 3, 0]} intensity={0.1} color="#f59e0b" />
-        <ChainSpiral sessions={demo} />
-        <GridFloor />
-        {showHex && <FloatingHex />}
-        <OrbitControls enableDamping dampingFactor={0.04} enablePan={false} minDistance={2} maxDistance={12} autoRotate={!hasSessions} autoRotateSpeed={0.4} />
-      </Canvas>
+    <div style={{ width: "100%", height, position: "relative", borderRadius: 14, overflow: "hidden",
+      background: "radial-gradient(ellipse at center, rgba(124,58,237,0.03), transparent 70%)" }}>
+      <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block" }} />
       <div style={{ position: "absolute", bottom: 14, left: 0, right: 0, textAlign: "center" }}>
         <span className="m" style={{ fontSize: 9, color: "rgba(124,58,237,0.3)", letterSpacing: "0.12em" }}>
-          {hasSessions ? sessions.length + " BLOCKS SEALED" : "DEMO CHAIN"} // DRAG TO ROTATE // SCROLL TO ZOOM
+          {sessions.length > 0 ? sessions.length + " BLOCKS SEALED" : "DEMO CHAIN"}
         </span>
       </div>
     </div>

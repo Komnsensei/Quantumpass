@@ -1,4 +1,4 @@
-const env = typeof process !== 'undefined' && process?.env ? process.env : (typeof import.meta !== 'undefined' ? import.meta.env : {});
+﻿const env = import.meta.env || {};
 const API = env.VITE_QRBTC_API_URL || env.QRBTC_API_URL || 'https://qrbtc-api.vercel.app/api';
 const HEXAGENT_API = env.VITE_HEXAGENT_API_URL || env.HEXAGENT_API_URL || (typeof window !== 'undefined' ? '/api' : 'http://localhost:3000/api');
 
@@ -117,7 +117,7 @@ export async function getPass(holderId) {
   return r.json();
 }
 
-export async function mintBead(holderId, beadType, beadContent, metadata) {
+export async function mintBead(holderId, beadType, beadContent, metadata, apiKey = '') {
   const r = await fetch(HEXAGENT_API + '/bead/mint', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
@@ -137,3 +137,4 @@ export async function getGovernanceState() {
   });
   return r.json();
 }
+
