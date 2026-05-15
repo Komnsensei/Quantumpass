@@ -7,7 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-export { TIER_LEVELS, VOW_STATUS, BEAD_TYPES, getTier, createPassport, validatePassport, createBead, loadPassport };
+export { TIER_LEVELS, VOW_STATUS, BEAD_TYPES, getTier, createPassport, validatePassport, createBead, loadPassport, savePassport };
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -119,6 +119,17 @@ function createBead(type, content, metadata = {}) {
     zenodo_doi: null,
     minted: false
   };
+}
+
+function savePassport(pass) {
+  validatePassport(pass);
+  const passesDir = path.join(__dirname, '../passes');
+  if (!fs.existsSync(passesDir)) {
+    fs.mkdirSync(passesDir, { recursive: true });
+  }
+  const passPath = path.join(passesDir, `${pass.holder.id}.json`);
+  fs.writeFileSync(passPath, JSON.stringify(pass, null, 2), 'utf8');
+  return passPath;
 }
 
 function loadPassport(holderId) {
