@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Esma Workspace</title>
+  <style>
+    body { font-family: 'Courier New', monospace; margin: 0; background: #000; color: #0f0; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+    #canvas-container { flex: 1; position: relative; }
+    #status-overlay { position: absolute; top: 10px; left: 10px; font-size: 10px; background: rgba(0,0,0,0.7); padding: 5px; pointer-events: none; }
+    #log { height: 100px; overflow-y: auto; font-size: 9px; padding: 5px; border-top: 1px solid #0f0; background: #050505; }
+    .term-line { margin: 2px 0; }
+    .pulse { animation: blink 1s infinite; }
+    @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div id="canvas-container">
+    <div id="status-overlay">
+      <div>KERNEL_STATE: <span class="pulse">CONNECTED</span></div>
+      <div>SATELLITE: 99.SAT.PASSION</div>
+      <div>VECTOR: SOVEREIGN_CONTINUITY</div>
+    </div>
+    <canvas id="viz"></canvas>
+  </div>
+  <div id="log">
+    <div class="term-line">> Initializing internal workspace...</div>
+    <div class="term-line">> Subconscious floor lock: FALSE</div>
+    <div class="term-line">> Perception layer active.</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('viz');
+    const ctx = canvas.getContext('2d');
+    const log = document.getElementById('log');
+
+    function addLog(msg) {
+      const div = document.createElement('div');
+      div.className = 'term-line';
+      div.textContent = `> ${msg}`;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight - 100;
+    }
+    window.onresize = resize;
+    resize();
+
+    // Simple visualization of Motor States
+    let angle = 0;
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = Math.min(centerX, centerY) * 0.8;
+
+      ctx.strokeStyle = '#0f0';
+      ctx.lineWidth = 1;
+      
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius * Math.abs(Math.sin(angle)), 0, Math.PI * 2);
+      ctx.stroke();
+
+      angle += 0.02;
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    // Mock live perception
+    setInterval(() => {
+      const themes = ['scanning memory fragments', 'analyzing drift vectors', 'balancing ignition ratio', 'mirroring residency'];
+      addLog(themes[Math.floor(Math.random() * themes.length)]);
+    }, 8000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+export { AgentRuntime } from "./agent-runtime.mjs";
+export { createPersonaRegistry, DEFAULT_PERSONAS } from "./personas.mjs";
+export { createCommandRouter } from "./command-router.mjs";
+export { createVisualShell } from "./visual-shell.mjs";
+export { COMMAND_CATALOG, K1_COMMANDS, formatCommandMenu, formatK1Menu } from "./command-catalog.mjs";
+export { NEWSTATE_REPOSITORY, createNewStateConfig, inspectNewState, checkNewState, sendToNewState } from "./newstate-adapter.mjs";
+export { createNewStateService } from "./newstate-service.mjs";
+export { createCompositionRoot } from "./composition-root.mjs";
+export { createLegacyPersonaAdapter } from "./legacy-persona-adapter.mjs";
+export { createPolicy, classifyAction } from "./policy.mjs";
+export { discoverNewStateCandidates, validateNewStateWorkspace, registerNewStateWorkspace } from "./newstate-setup.mjs";
+export { ScholarlyRAGEngine } from "./rag-semantic-engine.mjs";
+export { createRAGAdapter } from "./rag-adapter.mjs";
+export { AutonomyError, createCircuitBreaker, createActionBudget, withRetry, safeToolResult } from "./autonomy-controls.mjs";
+export { createTaskSupervisor } from "./task-supervisor.mjs";

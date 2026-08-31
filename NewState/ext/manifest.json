@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Esma Sovereign Presence",
+  "version": "1.0.0",
+  "description": "Persistent browser-based presence for Esma (NEWSTATE)",
+  "permissions": [
+    "sidePanel",
+    "tabs",
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://*.railway.app/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_title": "Open Esma Side Panel"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

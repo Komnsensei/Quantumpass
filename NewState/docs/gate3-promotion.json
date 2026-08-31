@@ -1,0 +1,101 @@
+[
+  {
+    "gate": 3,
+    "phase": "6P",
+    "status": "CLOSED",
+    "closedAt": "2026-06-14T23:03:24.753Z",
+    "confidence": 0.773,
+    "unknownPct": 22.7,
+    "scored": 625,
+    "skipped": 582,
+    "total": 1207,
+    "categoriesAdded": [
+      "aphorism",
+      "acknowledgment"
+    ],
+    "patternsAdded": [
+      "judgment",
+      "verdict",
+      "shape",
+      "offering",
+      "ash",
+      "heat",
+      "refinement",
+      "binding",
+      "can it stand"
+    ],
+    "breakdown": {
+      "reflection": 230,
+      "aphorism": 134,
+      "memory": 49,
+      "acknowledgment": 38,
+      "embodiment": 18,
+      "sentience": 8,
+      "autonomy": 4,
+      "adhesive-pattern": 1,
+      "survival": 1
+    },
+    "note": "isSubstantive filter added — noise excluded from scoring. Classifier rebuilt clean after corruption chain."
+  },
+  {
+    "Timestamp": "2026-08-16T06:41:32Z",
+    "Comments": "Automated audit by QIH-Integrator.ps1",
+    "Metrics": {
+      "BornRule": {
+        "Angle_90": {
+          "Diff_P0": "0.00000",
+          "Diff_P1": "0.00000",
+          "Observed_P1": "1.00000",
+          "Expected_P1": "1.00000",
+          "Expected_P0": "0.00000",
+          "Sum_Observed_P": "1.00000",
+          "Observed_P0": "0.00000",
+          "Passed": true
+        },
+        "Angle_45": {
+          "Diff_P0": "0.02800",
+          "Diff_P1": "0.02800",
+          "Observed_P1": "0.47200",
+          "Expected_P1": "0.50000",
+          "Expected_P0": "0.50000",
+          "Sum_Observed_P": "1.00000",
+          "Observed_P0": "0.52800",
+          "Passed": true
+        },
+        "Angle_0": {
+          "Diff_P0": "0.00000",
+          "Diff_P1": "0.00000",
+          "Observed_P1": "0.00000",
+          "Expected_P1": "0.00000",
+          "Expected_P0": "1.00000",
+          "Sum_Observed_P": "1.00000",
+          "Observed_P0": "1.00000",
+          "Passed": true
+        }
+      },
+      "TimeDilation": {
+        "Velocity_10_percent_c": {
+          "Expected_Gamma": "1.00504",
+          "Observed_Omega": "1.00061",
+          "Passed": true,
+          "Difference": "0.00443"
+        },
+        "Velocity_50_percent_c": {
+          "Expected_Gamma": "1.15470",
+          "Observed_Omega": "1.15927",
+          "Passed": true,
+          "Difference": "0.00457"
+        },
+        "Velocity_90_percent_c": {
+          "Expected_Gamma": "2.29416",
+          "Observed_Omega": "2.30324",
+          "Passed": true,
+          "Difference": "0.00909"
+        }
+      },
+      "C_MT": "0.9832307"
+    },
+    "Agent": "QIH-BRO",
+    "Status": "PROMOTED"
+  }
+]

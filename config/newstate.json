@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/komnsensei/NewState.git",
+  "root": "../NEWSTATE",
+  "serverUrl": "http://127.0.0.1:8080",
+  "mcpUrl": "http://127.0.0.1:3100",
+  "paths": {
+    "server": "server.cjs",
+    "mcpServer": "mcp-server/index.js",
+    "fvsmb": "kernel/governor/fvsmb-engine.cjs"
+  },
+  "environment": {
+    "NEWSTATE_ROOT": "Override the sidecar root",
+    "NEWSTATE_SERVER_URL": "Override the kernel URL",
+    "NEWSTATE_MCP_URL": "Override the MCP URL",
+    "NEWSTATE_FVSMB_ENGINE": "Override the FVSMB engine path"
+  }
+}
