@@ -12,6 +12,7 @@ import { createRequire } from "module";
 import { buildWizard } from "./bro-build.mjs";
 import { WEB_TOOLS } from "./bro-web.mjs";
 import { detectGoogleCloudContext, discoverVertexModels, chooseVertexModel, loadModelPreference, saveModelPreference, formatModelList, modelPreferencePath } from "./model-selector.mjs";
+import { askFreebuff, freebuffAvailable, freebuffBaseUrl, freebuffModel } from "./runtime/freebuff-provider.mjs";
 import { fileURLToPath } from "url";
 
 const require = createRequire(import.meta.url);
@@ -1922,6 +1923,28 @@ function detectGcpProjectId(){
 async function askChat(chatHistory, ret, abortSignal){
   ret=ret||3;
   stats.apiCalls++;
+
+  // The Freebuff brain is the working brain: when a key is configured it
+  // handles the turn first, and Vertex remains the fallback.
+  if (freebuffAvailable()) {
+    var fbStart=Date.now();
+    try{
+      var fbText = await askFreebuff(chatHistory, {
+        system: buildSys(),
+        abortSignal: abortSignal,
+        retries: 2
+      });
+      saveStat();
+      return {
+        content: fbText,
+        elapsed: ((Date.now()-fbStart)/1000).toFixed(1),
+        tokens: 0,
+        brain: "freebuff"
+      };
+    }catch(fbErr){
+      console.log(p("dim","  (freebuff brain unavailable - " + (fbErr.message||fbErr).substring(0,120) + "; falling back to Vertex)"));
+    }
+  }
 
   if (!cachedVertexToken) refreshVertexToken(); // never set via env - try gcloud once
   if (!cachedGcpProjectId) detectGcpProjectId(); // ditto for the project id

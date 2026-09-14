@@ -1,3 +1,5 @@
+import crypto from "crypto";
+import fs from "fs";
 import { formatCommandMenu, formatK1Menu } from "./command-catalog.mjs";
 import { checkNewState, sendToNewState } from "./newstate-adapter.mjs";
 import { createNewStateService } from "./newstate-service.mjs";
@@ -21,6 +23,49 @@ export function createCommandRouter({ runtime, visualShell, legacy = async () =>
       write(formatK1Menu());
       return true;
     }
+
+    if (input.startsWith("/brute crack ")) {
+      const parts = input.slice("/brute crack ".length).trim().split(/\s+/);
+      const targetHash = parts[0];
+      const wordlistPath = parts[1];
+      const algorithm = parts[2] || "sha256";
+
+      if (!targetHash || !wordlistPath) {
+        write("  Usage: /brute crack <hash> <wordlist_path> [algorithm]");
+        return true;
+      }
+
+      if (!fs.existsSync(wordlistPath)) {
+        write(`  Wordlist not found: ${wordlistPath}`);
+        return true;
+      }
+
+      write(`  Scanning wordlist using ${algorithm}...`);
+      try {
+        const fileContent = fs.readFileSync(wordlistPath, 'utf8');
+        const words = fileContent.split(/\r?\n/);
+        let cracked = null;
+
+        for (const word of words) {
+          if (!word) continue;
+          const hash = crypto.createHash(algorithm).update(word).digest('hex');
+          if (hash === targetHash.trim().toLowerCase()) {
+            cracked = word;
+            break;
+          }
+        }
+
+        if (cracked) {
+          write(`  [+] SUCCESS: Found match -> "${cracked}"`);
+        } else {
+          write(`  [-] Not cracked in this wordlist.`);
+        }
+      } catch (err) {
+        write(`  Error reading wordlist: ${err.message}`);
+      }
+      return true;
+    }
+
     if (input === "/newstate") {
       write(JSON.stringify(await sidecar.health(), null, 2));
       return true;
