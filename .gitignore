@@ -82,3 +82,5 @@ dycrag_output.txt
 # Legacy modules remain tracked; only generated runtime state is ignored.
 .bro/
 _fix_python_files.sh
+rockyou.txt
+extras/
