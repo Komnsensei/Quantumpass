@@ -46,7 +46,8 @@ erslynnhquantumpass
 *.bak.*
 .env.local.bak*
 qbtc-protocol/
-builderbro/
-passes/
-ledger/
 QUANTUMPASS-v1.0-beta-VERIFYD-AUDIT*
+
+# BuilderBro — keep source, ignore runtime store + logs
+builderbro/rag/store/
+builderbro/self-improvement-log.jsonl
