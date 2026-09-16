@@ -54,12 +54,17 @@ export async function askFreebuff(prompt, opts = {}) {
   }
   if (!messages.length) messages.push({ role: "user", content: String(prompt) });
 
-  const body = { model: opts.model || freebuffModel(), messages };
+  const body = {
+    model: opts.model || freebuffModel(),
+    messages,
+    tool_choice: "none"   // prevents "Tool choice is none, but model called a tool"
+  };
   if (Number.isFinite(opts.temperature)) body.temperature = Math.min(2, Math.max(0, opts.temperature));
   if (opts.maxTokens) body.max_tokens = opts.maxTokens;
 
   const retries = Number.isFinite(opts.retries) ? opts.retries : 3;
   let lastErr = null;
+
   for (let i = 0; i < retries; i++) {
     try {
       const timeoutSignal = AbortSignal.timeout(120000);
