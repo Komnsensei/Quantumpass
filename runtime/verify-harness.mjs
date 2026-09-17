@@ -3,17 +3,43 @@
 // structured report with a numerical confidence score.
 
 import { execSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+
+/**
+ * Infer the best test command for a project directory.
+ * Used by local vibe/automation modules.
+ */
+export function detectTestCommand(cwd = process.cwd()) {
+  const pkgPath = join(cwd, "package.json");
+  if (existsSync(pkgPath)) {
+    try {
+      const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
+      const scripts = pkg.scripts || {};
+      if (scripts.test) return "npm test";
+      if (scripts["test:unit"]) return "npm run test:unit";
+      if (scripts.smoke) return "npm run smoke";
+    } catch {
+      /* ignore */
+    }
+    return "npm test";
+  }
+  if (existsSync(join(cwd, "pytest.ini")) || existsSync(join(cwd, "pyproject.toml"))) {
+    return "pytest -q";
+  }
+  if (existsSync(join(cwd, "Cargo.toml"))) return "cargo test";
+  if (existsSync(join(cwd, "go.mod"))) return "go test ./...";
+  return "npm test";
+}
 
 export class VerificationHarness {
   constructor({
     cwd = process.cwd(),
-    testCommand = "npm test",
+    testCommand = null,
     timeoutMs = 120_000
   } = {}) {
     this.cwd = cwd;
-    this.testCommand = testCommand;
+    this.testCommand = testCommand || detectTestCommand(cwd);
     this.timeoutMs = timeoutMs;
   }
 
@@ -28,13 +54,7 @@ export class VerificationHarness {
     let testPassed = false;
     let rawOutput = "";
     const failures = [];
-
-    // Prefer package scripts if present; fall back gracefully
-    const pkgPath = join(this.cwd, "package.json");
-    let cmd = this.testCommand;
-    if (existsSync(pkgPath) && this.testCommand === "npm test") {
-      // leave as-is; npm will report missing script cleanly
-    }
+    const cmd = this.testCommand;
 
     try {
       rawOutput = execSync(cmd, {
