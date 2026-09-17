@@ -25,6 +25,13 @@ export function freebuffAvailable() {
   return Boolean(freebuffApiKey() && freebuffBaseUrl());
 }
 
+/** Last token usage reported by the provider (if any). */
+let _lastUsage = null;
+
+export function freebuffLastUsage() {
+  return _lastUsage;
+}
+
 function toMessages(chatHistory) {
   const messages = [];
   const hist = Array.isArray(chatHistory) ? chatHistory : [];
@@ -133,6 +140,7 @@ export async function askFreebuff(prompt, opts = {}) {
       }
 
       const d = await r.json();
+      _lastUsage = d.usage || null;
       const { text, detail } = extractText(d);
       if (!text) {
         throw new Error("Returned empty content" + (detail ? " — " + detail : ""));
