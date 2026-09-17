@@ -1,20 +1,19 @@
 // freebuff-provider.mjs — Groq-backed provider for BRO's runtime.
-// The API key comes from the environment (GROQ_KEY, or GROQ_API_KEY) - never
-// hardcode it here; .env loading lives in cli.mjs / loader.mjs.
-//
-// Default tries a short fallback chain so free-tier keys still work.
+// Key from env (GROQ_KEY / GROQ_API_KEY). Never hardcode.
 export const FREEBUFF_DEFAULT_MODEL = "llama-3.1-8b-instant";
 
-/** Models tried in order when the requested model 404s. */
+// Prefer small/fast models first. Skip huge reasoning models unless explicitly requested.
 const MODEL_FALLBACKS = [
   "llama-3.1-8b-instant",
   "llama-3.3-70b-versatile",
-  "openai/gpt-oss-20b",
-  "openai/gpt-oss-120b"
+  "openai/gpt-oss-20b"
 ];
 
+const MAX_SYSTEM_CHARS = 12000;
+const MAX_HISTORY_CHARS = 24000;
+const MAX_MSG_CHARS = 8000;
+
 export function freebuffBaseUrl() {
-  // Optional local Freebuff/OpenAI-compatible gateway
   const override = process.env.FREEBUFF_BASE_URL || process.env.OPENAI_BASE_URL || "";
   if (override) return override.replace(/\/$/, "");
   return "https://api.groq.com/openai/v1";
@@ -39,9 +38,14 @@ export function freebuffAvailable() {
 }
 
 let _lastUsage = null;
-
 export function freebuffLastUsage() {
   return _lastUsage;
+}
+
+function clamp(str, max) {
+  const s = String(str || "");
+  if (s.length <= max) return s;
+  return s.slice(0, max) + "\n…[truncated]";
 }
 
 function toMessages(chatHistory) {
@@ -58,15 +62,28 @@ function toMessages(chatHistory) {
     }
     if (!text) continue;
     const role = turn && (turn.role === "model" || turn.role === "assistant") ? "assistant" : "user";
-    messages.push({ role, content: text });
+    messages.push({ role, content: clamp(text, MAX_MSG_CHARS) });
   }
   return messages;
 }
 
+/** Keep recent turns within a char budget (drops oldest first). */
+function trimHistory(messages, budget) {
+  const out = [];
+  let used = 0;
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i];
+    const len = (m.content || "").length + 20;
+    if (used + len > budget && out.length > 0) break;
+    out.unshift(m);
+    used += len;
+  }
+  return out;
+}
+
 function extractText(data) {
   const choice = data?.choices?.[0];
-  if (!choice) return { text: "", finishReason: null, detail: "no choices" };
-
+  if (!choice) return { text: "", detail: "no choices" };
   const msg = choice.message || {};
   let text = typeof msg.content === "string" ? msg.content : "";
   if (!text && typeof msg.reasoning === "string") text = msg.reasoning;
@@ -75,17 +92,16 @@ function extractText(data) {
     text = msg.content.map(p => (typeof p === "string" ? p : p?.text || "")).join("");
   }
   if (!text && typeof choice.text === "string") text = choice.text;
-
   return {
     text: (text || "").trim(),
-    finishReason: choice.finish_reason || null,
     detail: !text
-      ? `empty content (finish_reason=${choice.finish_reason || "?"}, keys=${Object.keys(msg).join(",")})`
+      ? `empty (finish_reason=${choice.finish_reason || "?"}, keys=${Object.keys(msg).join(",")})`
       : null
   };
 }
 
 function modelCandidates(preferred) {
+  // If user forced a huge model via env, still try it first, then fall back to small ones.
   const list = [preferred, ...MODEL_FALLBACKS].filter(Boolean);
   return [...new Set(list)];
 }
@@ -96,35 +112,38 @@ export async function askFreebuff(prompt, opts = {}) {
   if (!key) throw new Error("No API key configured");
   if (!base) throw new Error("No base URL configured");
 
-  const messages = [];
-  if (opts.system) messages.push({ role: "system", content: opts.system });
-  for (const m of toMessages(Array.isArray(prompt) ? prompt : [{ role: "user", parts: [{ text: prompt }] }])) {
-    messages.push(m);
-  }
-  if (!messages.length) messages.push({ role: "user", content: String(prompt) });
+  let system = opts.system ? clamp(opts.system, MAX_SYSTEM_CHARS) : "";
+  let history = toMessages(Array.isArray(prompt) ? prompt : [{ role: "user", parts: [{ text: prompt }] }]);
+  history = trimHistory(history, MAX_HISTORY_CHARS);
+  if (!history.length) history = [{ role: "user", content: clamp(String(prompt), MAX_MSG_CHARS) }];
 
   const preferred = opts.model || freebuffModel();
   const candidates = modelCandidates(preferred);
   const retries = Number.isFinite(opts.retries) ? opts.retries : 2;
   let lastErr = null;
 
+  // On 413, shrink harder and retry
+  let shrinkPasses = 0;
+
   for (const model of candidates) {
-    const body = {
-      model,
-      messages,
-      temperature: Number.isFinite(opts.temperature) ? Math.min(2, Math.max(0, opts.temperature)) : 0.7,
-      max_tokens: opts.maxTokens || 4096
-    };
-
-    // Only attach tools + tool_choice together. Sending tool_choice:"none"
-    // without a tools array causes: "Tool choice is none, but model called a tool"
-    // when the system prompt talks about tools (BRO's custom <<<TOOL:...>>> protocol).
-    if (Array.isArray(opts.tools) && opts.tools.length) {
-      body.tools = opts.tools;
-      if (opts.toolChoice !== undefined) body.tool_choice = opts.toolChoice;
-    }
-
     for (let i = 0; i < retries; i++) {
+      const messages = [];
+      if (system) messages.push({ role: "system", content: system });
+      for (const m of history) messages.push(m);
+
+      const body = {
+        model,
+        messages,
+        temperature: Number.isFinite(opts.temperature) ? Math.min(2, Math.max(0, opts.temperature)) : 0.7,
+        max_tokens: opts.maxTokens || 2048
+      };
+
+      // Never send tool_choice without a tools array (causes Groq 400).
+      if (Array.isArray(opts.tools) && opts.tools.length) {
+        body.tools = opts.tools;
+        if (opts.toolChoice !== undefined) body.tool_choice = opts.toolChoice;
+      }
+
       try {
         const timeoutSignal = AbortSignal.timeout(120000);
         const r = await fetch(base + "/chat/completions", {
@@ -140,7 +159,17 @@ export async function askFreebuff(prompt, opts = {}) {
 
         if (r.status === 404) {
           const errBody = await r.text().catch(() => "");
-          lastErr = new Error("Model unavailable: " + model + (errBody ? " — " + errBody.slice(0, 120) : ""));
+          lastErr = new Error("Model unavailable: " + model + (errBody ? " — " + errBody.slice(0, 100) : ""));
+          break; // next model
+        }
+
+        if (r.status === 413) {
+          // Payload too large — shrink context and retry same model once, then next model
+          shrinkPasses++;
+          system = clamp(system, Math.floor(MAX_SYSTEM_CHARS / (1 + shrinkPasses)));
+          history = trimHistory(history, Math.floor(MAX_HISTORY_CHARS / (1 + shrinkPasses)));
+          lastErr = new Error("Request too large (413) for " + model);
+          if (shrinkPasses <= 2) continue;
           break;
         }
 
@@ -156,24 +185,27 @@ export async function askFreebuff(prompt, opts = {}) {
         }
         if (!r.ok) {
           const errBody = await r.text().catch(() => "");
+          // Don't hard-fail the whole chain on tool_choice ghosts from stale code paths
+          if (r.status === 400 && /tool choice/i.test(errBody)) {
+            lastErr = new Error("API rejected payload: 400 tool_choice conflict");
+            break;
+          }
           throw new Error("API rejected payload: " + r.status + (errBody ? " - " + errBody.slice(0, 300) : ""));
         }
 
         const d = await r.json();
         _lastUsage = d.usage || null;
         const { text, detail } = extractText(d);
-        if (!text) {
-          throw new Error("Returned empty content" + (detail ? " — " + detail : ""));
-        }
+        if (!text) throw new Error("Returned empty content" + (detail ? " — " + detail : ""));
         return text;
       } catch (e) {
         lastErr = e;
         if (e.name === "AbortError" || (opts.abortSignal && opts.abortSignal.aborted)) throw e;
-        if (/does not exist|model unavailable|404/i.test(String(e.message || ""))) break;
+        if (/does not exist|model unavailable|404|413|too large/i.test(String(e.message || ""))) break;
         if (i < retries - 1) await new Promise(ok => setTimeout(ok, (i + 1) * 1000));
       }
     }
   }
 
-  throw lastErr || new Error("Request failed — no available model on this key");
+  throw lastErr || new Error("Request failed — no available model");
 }
