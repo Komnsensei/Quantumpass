@@ -5,6 +5,7 @@ import { checkNewState, sendToNewState } from "./newstate-adapter.mjs";
 import { createNewStateService } from "./newstate-service.mjs";
 import { createPolicy } from "./policy.mjs";
 import { discoverNewStateCandidates, validateNewStateWorkspace } from "./newstate-setup.mjs";
+import { handleTheoryCommand } from "./theory-cli-bridge.mjs";
 
 export function createCommandRouter({ runtime, visualShell, legacy = async () => false, output = process.stdout, newStateConfig = undefined, newStateService = null, authorize = null, tasks = null } = {}) {
   const sidecar = newStateService || createNewStateService({ config: newStateConfig, output });
@@ -21,6 +22,13 @@ export function createCommandRouter({ runtime, visualShell, legacy = async () =>
     }
     if (input === "/help k1" || input === "/k1") {
       write(formatK1Menu());
+      return true;
+    }
+
+    // Theory / self-evolution loop
+    if (input === "/theory" || input.startsWith("/theory ")) {
+      const args = input.replace(/^\/theory\s*/, "").trim().split(/\s+/).filter(Boolean);
+      await handleTheoryCommand(args);
       return true;
     }
 
