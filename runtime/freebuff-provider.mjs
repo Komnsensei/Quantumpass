@@ -14,11 +14,20 @@ const MODEL_FALLBACKS = [
 ];
 
 export function freebuffBaseUrl() {
+  // Optional local Freebuff/OpenAI-compatible gateway
+  const override = process.env.FREEBUFF_BASE_URL || process.env.OPENAI_BASE_URL || "";
+  if (override) return override.replace(/\/$/, "");
   return "https://api.groq.com/openai/v1";
 }
 
 export function freebuffApiKey() {
-  return process.env.GROQ_KEY || process.env.GROQ_API_KEY || "";
+  return (
+    process.env.GROQ_KEY ||
+    process.env.GROQ_API_KEY ||
+    process.env.FREEBUFF_API_KEY ||
+    process.env.OPENAI_API_KEY ||
+    ""
+  );
 }
 
 export function freebuffModel() {
@@ -107,10 +116,12 @@ export async function askFreebuff(prompt, opts = {}) {
       max_tokens: opts.maxTokens || 4096
     };
 
-    if (opts.toolChoice !== undefined) {
-      body.tool_choice = opts.toolChoice;
-    } else if (!/gpt-oss|o1|o3|reasoning/i.test(model)) {
-      body.tool_choice = "none";
+    // Only attach tools + tool_choice together. Sending tool_choice:"none"
+    // without a tools array causes: "Tool choice is none, but model called a tool"
+    // when the system prompt talks about tools (BRO's custom <<<TOOL:...>>> protocol).
+    if (Array.isArray(opts.tools) && opts.tools.length) {
+      body.tools = opts.tools;
+      if (opts.toolChoice !== undefined) body.tool_choice = opts.toolChoice;
     }
 
     for (let i = 0; i < retries; i++) {
@@ -130,7 +141,7 @@ export async function askFreebuff(prompt, opts = {}) {
         if (r.status === 404) {
           const errBody = await r.text().catch(() => "");
           lastErr = new Error("Model unavailable: " + model + (errBody ? " — " + errBody.slice(0, 120) : ""));
-          break; // try next model in candidates
+          break;
         }
 
         if (r.status === 429) {
@@ -158,12 +169,11 @@ export async function askFreebuff(prompt, opts = {}) {
       } catch (e) {
         lastErr = e;
         if (e.name === "AbortError" || (opts.abortSignal && opts.abortSignal.aborted)) throw e;
-        // Model-not-found style messages: advance to next candidate
         if (/does not exist|model unavailable|404/i.test(String(e.message || ""))) break;
         if (i < retries - 1) await new Promise(ok => setTimeout(ok, (i + 1) * 1000));
       }
     }
   }
 
-  throw lastErr || new Error("Request failed — no available Groq model on this key");
+  throw lastErr || new Error("Request failed — no available model on this key");
 }
