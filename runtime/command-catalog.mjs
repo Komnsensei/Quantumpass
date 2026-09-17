@@ -11,6 +11,8 @@ export const COMMAND_CATALOG = [
   { name: "/theory add", group: "autonomy", description: "Register a theory claim with invariants" },
   { name: "/theory list", group: "autonomy", description: "List registered theory claims" },
   { name: "/theory build", group: "autonomy", description: "Run verify loop for a claim (immune + harness)" },
+  { name: "/freebuff", group: "autonomy", description: "Freebuff free agents via CLI credentials + SDK" },
+  { name: "/freebuff status", group: "autonomy", description: "Check Freebuff credentials and SDK" },
   { name: "/thought", group: "runtime", description: "Toggle safe processing summaries" },
   { name: "/pause", group: "runtime", description: "Pause the current turn" },
   { name: "/resume", group: "runtime", description: "Resume a paused turn" },
