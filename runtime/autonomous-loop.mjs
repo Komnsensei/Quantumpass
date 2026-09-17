@@ -5,11 +5,17 @@ import { ImmuneSystem } from "./immune-system.mjs";
 import { VerificationHarness } from "./verify-harness.mjs";
 import { TheoryStore } from "./theory-store.mjs";
 
+/** Notice injected into prompts when generation budget is constrained. */
+export function generationBudgetNotice({ maxActions = 20, maxFailures = 5 } = {}) {
+  return `Generation budget: at most ${maxActions} actions and ${maxFailures} failures this turn. Prefer minimal diffs; stop when verification passes.`;
+}
+
 export class AutonomousLoop {
   constructor(options = {}) {
     this.immune = new ImmuneSystem(options);
     this.harness = new VerificationHarness(options);
     this.theory = new TheoryStore(options);
+    this.options = options;
   }
 
   /**
@@ -18,6 +24,7 @@ export class AutonomousLoop {
   buildAgentContext(claimId) {
     const claim = this.theory.getClaim(claimId);
     const immuneContext = this.immune.loadImmuneContext();
+    const budget = generationBudgetNotice(this.options);
 
     return {
       claim,
@@ -27,6 +34,8 @@ ${immuneContext}
 
 === TARGET THEORY CLAIM ===
 ${claim ? JSON.stringify(claim, null, 2) : "No active claim selected."}
+
+=== ${budget} ===
 `
     };
   }
