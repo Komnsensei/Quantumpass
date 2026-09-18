@@ -7,24 +7,19 @@ export const COMMAND_CATALOG = [
   { name: "/git", group: "development", description: "Inspect repository state" },
   { name: "/build", group: "development", description: "Start the project builder" },
   { name: "/skills", group: "development", description: "Manage skills" },
-  { name: "/theory", group: "autonomy", description: "Theory claims: add | list | build (self-evolution loop)" },
-  { name: "/theory add", group: "autonomy", description: "Register a theory claim with invariants" },
-  { name: "/theory list", group: "autonomy", description: "List registered theory claims" },
-  { name: "/theory build", group: "autonomy", description: "Run verify loop for a claim (immune + harness)" },
+  { name: "/theory", group: "autonomy", description: "Theory claims: add | list | build" },
+  { name: "/aware", group: "autonomy", description: "Conscious substrate: status | step | report | run" },
+  { name: "/aware status", group: "autonomy", description: "Workspace + self-model + metrics" },
+  { name: "/aware step", group: "autonomy", description: "Inject percept and run one reflective step" },
+  { name: "/aware report", group: "autonomy", description: "Last natural-language awareness report" },
   { name: "/freebuff", group: "autonomy", description: "Freebuff free agents via CLI credentials + SDK" },
-  { name: "/freebuff status", group: "autonomy", description: "Check Freebuff credentials and SDK" },
   { name: "/thought", group: "runtime", description: "Toggle safe processing summaries" },
   { name: "/pause", group: "runtime", description: "Pause the current turn" },
   { name: "/resume", group: "runtime", description: "Resume a paused turn" },
   { name: "/auto", group: "autonomy", description: "Configure confirmed autonomous execution" },
   { name: "/help k1", group: "operations", description: "List every registered K1 operation" },
   { name: "/blackhat", group: "security", description: "Authorized defensive security workflows only" },
-  { name: "/newstate", group: "sidecar", description: "Check the NewState sidecar" },
-  { name: "/newstate inspect", group: "sidecar", description: "Inspect NewState installation paths" },
-  { name: "/newstate setup", group: "sidecar", description: "Show the NewState checkout and engine requirements" },
-  { name: "/newstate start", group: "sidecar", description: "Start local NewState kernel and MCP bridge" },
-  { name: "/newstate stop", group: "sidecar", description: "Stop local NewState processes" },
-  { name: "/newstate send", group: "sidecar", description: "Send a message through the NewState MCP bridge" }
+  { name: "/newstate", group: "sidecar", description: "Check the NewState sidecar" }
 ];
 
 export const K1_COMMANDS = [
