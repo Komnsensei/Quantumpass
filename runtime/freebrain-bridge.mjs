@@ -26,10 +26,22 @@ function pythonBin() {
   return process.env.FREEBRAIN_PYTHON || process.env.PYTHON || "python3";
 }
 
-/**
- * Run agent_runtime.py with args; stream stdout/stderr to log.
- * @returns {Promise<{ code: number, stdout: string, stderr: string }>}
- */
+function freebrainEnv() {
+  const env = { ...process.env };
+  env.PYTHONIOENCODING = "utf-8";
+  env.PYTHONUTF8 = "1";
+
+  if (!env.GROQ_API_KEY && env.GROQ_KEY) env.GROQ_API_KEY = env.GROQ_KEY;
+
+  // Prefer working Groq chat models (override only if user has not set one)
+  if (!env.GROQ_MODEL) env.GROQ_MODEL = "openai/gpt-oss-20b";
+
+  // Skip empty Ollama instead of 30s cooldown every call
+  if (env.BRAIN_SKIP_EMPTY_LOCAL === undefined) env.BRAIN_SKIP_EMPTY_LOCAL = "1";
+
+  return env;
+}
+
 export function runFreebrain(args, { cwd = null, log = console.log, timeoutMs = 180000 } = {}) {
   const root = resolveFreebrainRoot();
   if (!root) {
@@ -43,13 +55,7 @@ export function runFreebrain(args, { cwd = null, log = console.log, timeoutMs = 
 
   const script = join(root, "agent_runtime.py");
   const bin = pythonBin();
-  const env = { ...process.env };
-
-  // Windows cp1252 cannot print many Unicode chars (en-dash, etc.) → crash on print()
-  env.PYTHONIOENCODING = "utf-8";
-  env.PYTHONUTF8 = "1";
-
-  if (!env.GROQ_API_KEY && env.GROQ_KEY) env.GROQ_API_KEY = env.GROQ_KEY;
+  const env = freebrainEnv();
 
   return new Promise((resolve, reject) => {
     const child = spawn(bin, [script, ...args], {
@@ -104,7 +110,8 @@ export async function handleBrainCommand(args, { log = console.log } = {}) {
   /brain providers           Same as --providers
   /brain check               Health check (--check)
   /brain chat <prompt...>    One-shot chat
-  /brain goal <goal...>      Goal-directed tool loop
+  /brain goal <goal...>      Goal tool loop (--reflex; more reliable)
+  /brain goal-verified <g>   Verified autonomy loop (stricter)
   /brain ping                Short connectivity chat
 `);
     return;
@@ -145,6 +152,16 @@ export async function handleBrainCommand(args, { log = console.log } = {}) {
         const goal = rest.join(" ").trim();
         if (!goal) {
           log("[-] Usage: /brain goal <goal>");
+          return;
+        }
+        // --reflex avoids autonomy verified-loop empty_response failures
+        await runFreebrain(["--goal", goal, "--reflex"], { log, timeoutMs: 600000 });
+        break;
+      }
+      case "goal-verified": {
+        const goal = rest.join(" ").trim();
+        if (!goal) {
+          log("[-] Usage: /brain goal-verified <goal>");
           return;
         }
         await runFreebrain(["--goal", goal], { log, timeoutMs: 600000 });
