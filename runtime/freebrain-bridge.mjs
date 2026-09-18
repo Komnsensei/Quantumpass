@@ -44,10 +44,12 @@ export function runFreebrain(args, { cwd = null, log = console.log, timeoutMs = 
   const script = join(root, "agent_runtime.py");
   const bin = pythonBin();
   const env = { ...process.env };
-  // Prefer Groq for interactive BRO use if cascade would otherwise hit empty local
-  if (!env.BRAIN_PROVIDERS && env.GROQ_API_KEY || env.GROQ_KEY) {
-    if (!env.GROQ_API_KEY && env.GROQ_KEY) env.GROQ_API_KEY = env.GROQ_KEY;
-  }
+
+  // Windows cp1252 cannot print many Unicode chars (en-dash, etc.) → crash on print()
+  env.PYTHONIOENCODING = "utf-8";
+  env.PYTHONUTF8 = "1";
+
+  if (!env.GROQ_API_KEY && env.GROQ_KEY) env.GROQ_API_KEY = env.GROQ_KEY;
 
   return new Promise((resolve, reject) => {
     const child = spawn(bin, [script, ...args], {
@@ -65,14 +67,14 @@ export function runFreebrain(args, { cwd = null, log = console.log, timeoutMs = 
     }, timeoutMs);
 
     child.stdout.on("data", (buf) => {
-      const s = buf.toString();
+      const s = buf.toString("utf8");
       stdout += s;
       for (const line of s.split(/\r?\n/)) {
         if (line.trim()) log(line);
       }
     });
     child.stderr.on("data", (buf) => {
-      const s = buf.toString();
+      const s = buf.toString("utf8");
       stderr += s;
       for (const line of s.split(/\r?\n/)) {
         if (line.trim()) log(line);
@@ -149,7 +151,6 @@ export async function handleBrainCommand(args, { log = console.log } = {}) {
         break;
       }
       default: {
-        // Treat whole line as chat prompt: /brain hello there
         const prompt = [sub, ...rest].join(" ").trim();
         await runFreebrain(["--chat", prompt], { log });
       }
