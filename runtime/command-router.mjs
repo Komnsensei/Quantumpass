@@ -8,6 +8,7 @@ import { discoverNewStateCandidates, validateNewStateWorkspace } from "./newstat
 import { handleTheoryCommand } from "./theory-cli-bridge.mjs";
 import { handleFreebuffCommand } from "./freebuff-agent.mjs";
 import { handleAwareCommand } from "./aware-cli.mjs";
+import { handleBrainCommand } from "./freebrain-bridge.mjs";
 
 export function createCommandRouter({ runtime, visualShell, legacy = async () => false, output = process.stdout, newStateConfig = undefined, newStateService = null, authorize = null, tasks = null } = {}) {
   const sidecar = newStateService || createNewStateService({ config: newStateConfig, output });
@@ -42,6 +43,12 @@ export function createCommandRouter({ runtime, visualShell, legacy = async () =>
     if (input === "/aware" || input.startsWith("/aware ")) {
       const args = input.replace(/^\/aware\s*/, "").trim().split(/\s+/).filter(Boolean);
       await handleAwareCommand(args, { log: write });
+      return true;
+    }
+
+    if (input === "/brain" || input.startsWith("/brain ")) {
+      const args = input.replace(/^\/brain\s*/, "").trim().split(/\s+/).filter(Boolean);
+      await handleBrainCommand(args, { log: write });
       return true;
     }
 
